@@ -13,6 +13,7 @@ Armor Property HentaiPregnancyMilkL Auto
 
 FormList Property HentaiMilkSquirtSpellList Auto
 Form Property HentaiMilkSquirtBYOHBottle Auto
+Faction property HentaiPregnantFaction Auto
 
 Spell Property HentaiSoulgemBirthSpell Auto
 Spell Property HentaiImpregnation Auto
@@ -268,7 +269,7 @@ bool function setPregnant(Actor father, Actor mother, bool isvictim, bool fertil
 					HentaiPregnantActorAlias pregnancy = PregnantActors[actorIndex]
 					pregnancy.ForceRefTo(mother)
 					pregnancy.setFather(father)
-					pregnancy.setFaterIsCreature(father.HasKeyword( Game.GetFormFromFile(0x13795, "Skyrim.esm") as Keyword ) || father.HasKeyword( Game.GetFormFromFile(0x13798, "Skyrim.esm") as Keyword ))
+					pregnancy.setFatherIsCreature(father.HasKeyword( Game.GetFormFromFile(0x13795, "Skyrim.esm") as Keyword ) || father.HasKeyword( Game.GetFormFromFile(0x13798, "Skyrim.esm") as Keyword ))
 					pregnancy.setBreastScaling(BreastScaling)
 					pregnancy.setBellyScaling(BellyScaling)
 					pregnancy.setFertilised(fertilised)
@@ -391,7 +392,7 @@ function SoulGemImpregnation(int pregnancyID = -1)
 		Actor mother = pregnancy.getMother()
 		Actor father = pregnancy.getFather()
 		bool forced = pregnancy.isVictim()
-		if (pregnancy.getFaterIsCreature() || !config.CreaturesOnly)
+		if (pregnancy.getFatherIsCreature() || !config.CreaturesOnly)
 			pregnancy.setSoulGemCount( pregnancy.getSoulGemCount() + 1)
 			Debug.Notification(father.GetLeveledActorBase().GetName() + Strings.ShowHentaiPregnancyStrings(3) + mother.GetLeveledActorBase().GetName())
 		endIf
@@ -412,10 +413,10 @@ function SoulGemBirth(int pregnancyID, float durationHours)
 			int iPregnancyDuration = durationHours as int
 			
 			;safety check, config.SoulGemDuration should always be > 0
-			if config.SoulGemDuration > 0 && (pregnancy.getFaterIsCreature() || !config.CreaturesOnly)
+			if config.SoulGemDuration > 0 && (pregnancy.getFatherIsCreature() || !config.CreaturesOnly)
 			
 				float soulGemSize = iPregnancyDuration / config.SoulGemDuration / pregnancy.getSoulGemCount()
-				If soulGemSize > 4 && !pregnancy.getFaterIsCreature()
+				If soulGemSize > 4 && !pregnancy.getFatherIsCreature()
 					mother.addItem(SoulGemBlackFilled, pregnancy.getSoulGemCount(), true)	
 				elseIf soulGemSize > 4
 					mother.addItem(SoulGemGrandFilled, pregnancy.getSoulGemCount(), true)	

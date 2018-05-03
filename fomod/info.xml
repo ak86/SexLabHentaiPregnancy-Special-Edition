@@ -1,6 +1,6 @@
 <fomod>
   <Name>SexLabHentaiPregnancy Special Edition</Name>
-  <Version>01-05-2018</Version>
+  <Version>02-05-2018</Version>
   <Author>Ed86</Author>
   <Website>https://www.patreon.com/Ed86</Website>
   <Description>
@@ -18,6 +18,7 @@
   added soulgem birthing
   added toggle to allow non unique npcs pregnancy
   added script checks so birthing/milking wont be interrupted by sexlab (and maybe other mods)
+  added HentaiPregnantFaction to detect pregnancy type/state, without dependency for HP
   full mcm translation support
   full script translation support
   something else

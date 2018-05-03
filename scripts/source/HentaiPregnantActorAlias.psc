@@ -25,7 +25,7 @@ float lastGameTime = 0.0
 
 bool isvictim = false
 bool fertilised = false
-bool FaterIsCreature = false
+bool FatherIsCreature = false
 bool BreastScaling = true
 bool BellyScaling = true
 
@@ -35,13 +35,16 @@ EndEvent
 
 auto State ReadyForPregnancy
 	Event OnBeginState()
+		if ActorRef != none
+			ActorRef.RemoveFromFaction(HentaiP.HentaiPregnantFaction)
+		endif
 		CurrentHour = 0
 		ActorRef = none
 		FatherRef = none
 		lastGameTime = 0.0
 		isvictim = false
 		fertilised = false
-		FaterIsCreature = false
+		FatherIsCreature = false
 		BreastScaling = true
 		BellyScaling = true
 		SoulGemCount = 0
@@ -85,12 +88,12 @@ Actor function getFather()
 	return FatherRef
 endFunction
 
-function setFaterIsCreature(bool ishe)
-	FaterIsCreature = ishe
+function setFatherIsCreature(bool ishe)
+	FatherIsCreature = ishe
 endFunction
 
-bool function getFaterIsCreature()
-	return 	FaterIsCreature
+bool function getFatherIsCreature()
+	return 	FatherIsCreature
 endFunction
 
 Actor function getMother()
@@ -201,10 +204,11 @@ endFunction
 State Inseminated
 	Event OnBeginState()
 		ActorRef = GetActorRef()
+		ActorRef.AddToFaction(HentaiP.HentaiPregnantFaction)
 	
 		int random = Utility.RandomInt(0, 100)
 		int chance = HentaiP.config.CumInflationChance
-		if random <= chance && (!HentaiP.config.CumInflationCreaturesOnly || (HentaiP.config.CumInflationCreaturesOnly && FaterIsCreature))
+		if random <= chance && (!HentaiP.config.CumInflationCreaturesOnly || (HentaiP.config.CumInflationCreaturesOnly && FatherIsCreature))
 			GoToState("CumInflated")
 		elseif fertilised
 			GoToState("Pregnant")
@@ -220,6 +224,12 @@ EndState
 
 State CumInflated
 	Event OnBeginState()
+		if fertilised
+			GetActorRef().SetFactionRank(HentaiP.HentaiPregnantFaction, 2)
+		else
+			GetActorRef().SetFactionRank(HentaiP.HentaiPregnantFaction, 1)
+		endif
+
 		CurrentBellySize = 1
 		TargetBellySize = HentaiP.config.MaxScaleBelly * 0.25
 		
@@ -266,6 +276,7 @@ EndState
 State Pregnant
 	Event OnBeginState()
 		ActorRef = GetActorRef()
+		GetActorRef().SetFactionRank(HentaiP.HentaiPregnantFaction, 3)
 		;Debug.Notification("HentaiPregnantActorAlias Pregnant")
 		int DurationDays = HentaiP.config.PregnancyDuration
 		

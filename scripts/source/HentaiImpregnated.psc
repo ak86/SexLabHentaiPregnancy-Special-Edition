@@ -19,6 +19,8 @@ Event OnEffectStart(Actor akTarget, Actor akCaster)										;preg start
 
 	CurrentBreastSize = NetImmerse.GetNodeScale(ActorRef, "NPC L Breast", false)
 	CurrentBellySize = NetImmerse.GetNodeScale(ActorRef, "NPC Belly", false)
+	ActorRef.AddToFaction(HentaiP.HentaiPregnantFaction)
+	ActorRef.SetFactionRank(HentaiP.HentaiPregnantFaction, 1)
 
 	RegisterForSingleUpdate(10)
 	RegisterForSingleUpdateGameTime(24)
@@ -62,6 +64,7 @@ Event OnEffectFinish(Actor akTarget, Actor akCaster)									;preg end
 		ResetBody()
 		UnregisterForUpdate()
 	EndIf
+	ActorRef.RemoveFromFaction(HentaiP.HentaiPregnantFaction)
 EndEvent
 
 function ResetBody()																	;quickly deflate
