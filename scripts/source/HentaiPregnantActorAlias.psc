@@ -37,6 +37,7 @@ auto State ReadyForPregnancy
 	Event OnBeginState()
 		if ActorRef != none
 			ActorRef.RemoveFromFaction(HentaiP.HentaiPregnantFaction)
+			ActorRef.RemoveFromFaction(HentaiP.HentaiLactatingFaction)
 		endif
 		CurrentHour = 0
 		ActorRef = none
@@ -126,6 +127,8 @@ endFunction
 
 int function setMilk(int i)
 	Milk = i
+	ActorRef.AddToFaction(HentaiP.HentaiLactatingFaction)
+	ActorRef.SetFactionRank(HentaiP.HentaiLactatingFaction, Milk)
 	return Milk
 endFunction
 
@@ -198,6 +201,17 @@ function decrSizeBelly()
 				HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC Belly", 1)
 			EndIf
 		EndIf
+	EndIf
+endFunction
+
+; called on player load game/changecell to refresh body, usefull when using NIE scaling
+function recheckBody()
+	if HentaiP.config.BellyScaling 
+		HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC Belly", CurrentBellySize)
+	EndIf
+	if HentaiP.config.BreastScaling 
+		HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC L Breast", CurrentBreastSize)
+		HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC R Breast", CurrentBreastSize)
 	EndIf
 endFunction
 
@@ -338,12 +352,14 @@ State Pregnant
 			EndIf
 			
 			If CurrentHour > DurationHours/3 && HentaiP.config.Milking
-				Milk += 1
+				setMilk(Milk + 1)
 				If ActorRef == HentaiP.PlayerRef
 					Debug.Notification(HentaiP.Strings.ShowHentaiPregnantActorAliasStrings(1))
 				Elseif HentaiP.config.NPCMilking
 					(HentaiP.HentaiMilkSquirtSpellList.GetAt(1) as Spell).Cast(ActorRef, ActorRef)
 				EndIf
+			Else
+				ActorRef.RemoveFromFaction(HentaiP.HentaiLactatingFaction)
 			EndIf
 			
 		Else
@@ -436,12 +452,14 @@ State PostPregnancy
 			lastGameTime = currentTime
 			
 			If CurrentHour+PostDurationHours/3 < PostDurationHours && HentaiP.config.Milking
-				Milk += 1
+				setMilk(Milk + 1)
 				If ActorRef == HentaiP.PlayerRef
 					Debug.Notification(HentaiP.Strings.ShowHentaiPregnantActorAliasStrings(1))
 				Elseif HentaiP.config.NPCMilking
 					(HentaiP.HentaiMilkSquirtSpellList.GetAt(1) as Spell).Cast(ActorRef, ActorRef)
 				EndIf
+			Else
+				ActorRef.RemoveFromFaction(HentaiP.HentaiLactatingFaction)
 			EndIf
 			;HentaiP.addTempPostPregnancyEffects(ActorRef, PostDurationHours - CurrentHour)
 			

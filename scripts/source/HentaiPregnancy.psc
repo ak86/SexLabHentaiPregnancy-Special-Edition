@@ -14,6 +14,7 @@ Armor Property HentaiPregnancyMilkL Auto
 FormList Property HentaiMilkSquirtSpellList Auto
 Form Property HentaiMilkSquirtBYOHBottle Auto
 Faction property HentaiPregnantFaction Auto
+Faction property HentaiLactatingFaction Auto
 
 Spell Property HentaiSoulgemBirthSpell Auto
 Spell Property HentaiImpregnation Auto
@@ -214,6 +215,17 @@ function clearPregnancies()
 	endWhile
 	config.pregnanciesCleared()
 	Debug.Notification(Strings.ShowHentaiPregnancyStrings(0))
+endFunction
+
+function UpdateSize()
+	int i = 0
+	while i < PregnantActors.Length
+		if PregnantActors[i].getMother() != none 
+			PregnantActors[i].recheckBody()
+		endIf
+		i += 1
+	endWhile
+	Debug.Notification("update")
 endFunction
 
 bool function setPregnant(Actor father, Actor mother, bool isvictim, bool fertilised)
