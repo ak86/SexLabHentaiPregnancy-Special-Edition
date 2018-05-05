@@ -33,8 +33,8 @@ Function ResetStrings()
 	HentaiPregnancyStrings[6] = " does not have NPC R Breast, check your skeleton, breast scaling is disabled"
 	HentaiPregnancyStrings[7] = " does not have NPC Belly node, check your skeleton, belly scaling is disabled"
 	
-	HentaiPregnancyConfigStrings = new string[4]
-	HentaiPregnancyConfigStrings[0] = "hrs left"
+	HentaiPregnancyConfigStrings = new string[5]
+	HentaiPregnancyConfigStrings[0] = "hours left"
 	HentaiPregnancyConfigStrings[1] = " days left"
 	HentaiPregnancyConfigStrings[2] = " (Post)"
 	HentaiPregnancyConfigStrings[3] = " By "

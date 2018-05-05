@@ -50,10 +50,13 @@ int OIDAllowAnal
 bool Property AllowAnal = false Auto Hidden
 
 int OIDAllowNonUnique
-bool Property AllowNonUnique = true Auto Hidden
+bool Property AllowNonUnique = false Auto Hidden
 
 int OIDBreastScaling
 bool Property BreastScaling = true Auto Hidden
+
+int OIDResetScaling
+bool Property ResetScaling = false Auto Hidden
 
 int OIDBellyScaling
 bool Property BellyScaling = true Auto Hidden
@@ -89,10 +92,10 @@ Float SoulGemBellySizeDefault = 1.0
 int OIDSoulGemBellySize
 
 int OIDSoulGemPregnancy
-bool Property SoulGemPregnancy = true Auto Hidden
+bool Property SoulGemPregnancy = false Auto Hidden
 
 int OIDForcedOnly
-bool Property ForcedOnly = true Auto Hidden
+bool Property ForcedOnly = false Auto Hidden
 
 int OIDCreaturesOnly
 bool Property CreaturesOnly = true Auto Hidden
@@ -102,7 +105,7 @@ Event OnConfigInit()
 EndEvent
 
 int function GetVersion()
-	return 20180417
+	return 20180505
 endFunction
 
 event OnVersionUpdate(int a_version)
@@ -177,7 +180,10 @@ Event OnPageReset(string page)
 
 				OIDBreastScaling = AddToggleOption("$HP_MCM_Pages1_BreastScaling", BreastScaling)
 				OIDMaxScaleBreasts = AddSliderOption("$HP_MCM_Pages1_MaxScaleBreasts", MaxScaleBreasts, "{1}")
-		
+
+				AddEmptyOption()
+				OIDResetScaling = AddToggleOption("$HP_MCM_Pages1_ResetScaling", ResetScaling)
+				
 	ElseIf page == "$HP_MCM_Pages2"
 		
 		SetCursorFillMode(TOP_TO_BOTTOM)
@@ -207,6 +213,7 @@ Event OnPageReset(string page)
 		int i = 0
 		while i < plist.Length
 			if hentaiPregnancyQuest.PregnantActors[i].GetActorRef() != none
+				;check if actor is cuminflating,pregnant,postpregnant
 				if !hentaiPregnancyQuest.isNotPregnant(hentaiPregnancyQuest.PregnantActors[i].GetActorRef())
 					AddTextOption(plist[i], "", OPTION_FLAG_DISABLED)
 					if (StringUtil.GetLength(plist[i]) > 0)
@@ -246,11 +253,13 @@ Event OnOptionSliderAccept(int option, float floatValue)
 		
 		SetSliderOptionValue(option, floatValue,"{1}")
 		MaxScaleBelly = floatValue
+		hentaiPregnancyQuest.UpdateSize()
 		
 	ElseIf option == OIDMaxScaleBreasts
 		
 		SetSliderOptionValue(option, floatValue, "{1}")
 		MaxScaleBreasts = floatValue
+		hentaiPregnancyQuest.UpdateSize()
 		
 	ElseIf option == OIDPregnancyDuration
 		
@@ -271,6 +280,7 @@ Event OnOptionSliderAccept(int option, float floatValue)
 		
 		SetSliderOptionValue(option, floatValue, "{1}")
 		SoulGemBellySize = floatValue
+		hentaiPregnancyQuest.UpdateSize()
 		
 	EndIf
 	
@@ -403,11 +413,21 @@ event OnOptionSelect(int option)
 	
 		BellyScaling = !BellyScaling
 		SetToggleOptionValue(OIDBellyScaling, BellyScaling)
+		hentaiPregnancyQuest.UpdateBellyScaling()
 		
 	elseIf option == OIDBreastScaling
 	
 		BreastScaling = !BreastScaling
 		SetToggleOptionValue(OIDBreastScaling, BreastScaling)
+		hentaiPregnancyQuest.UpdateBreastScaling()
+		
+	elseIf option == OIDResetScaling
+	
+		ResetScaling = !ResetScaling
+		SetToggleOptionValue(OIDResetScaling, ResetScaling)
+		hentaiPregnancyQuest.ResetScaling()
+		ResetScaling = !ResetScaling
+		SetToggleOptionValue(OIDResetScaling, ResetScaling)
 		
 	elseIf option == OIDMilking
 	
@@ -512,6 +532,9 @@ Event OnOptionHighlight(int option)
 	ElseIf option == OIDBreastScaling
 		SetInfoText("$HP_MCM_BreastScalingDescription")	
 		
+	ElseIf option == OIDResetScaling
+		SetInfoText("$HP_MCM_ResetScalingDescription")	
+		
 	ElseIf option == OIDBellyScaling
 		SetInfoText("$HP_MCM_BellyScalingDescription")	
 		
@@ -571,25 +594,26 @@ endEvent
 string[] function getPregnancyList()
 	string[] plist = new string[50]
 	int i = 0
-	int j = 0
 	while i < hentaiPregnancyQuest.PregnantActors.Length
+		;pregnancy hours left
 		int Remainder = hentaiPregnancyQuest.PregnantActors[i].getDurationHours() - hentaiPregnancyQuest.PregnantActors[i].getCurrentHour()
 		string TimeDesc = hentaiPregnancyQuest.Strings.ShowHentaiPregnancyConfigStrings(0)
-		if Remainder < 0 
+		if Remainder > 24
+			;pregnancy days left
+			Remainder = Remainder / 24
+			TimeDesc = hentaiPregnancyQuest.Strings.ShowHentaiPregnancyConfigStrings(1)
+		elseif hentaiPregnancyQuest.PregnantActors[i].getState() == "PostPregnancy"
+			;postpregnancy hours left
 			Remainder = Remainder + hentaiPregnancyQuest.PregnantActors[i].getPostDurationHours()
 			TimeDesc += hentaiPregnancyQuest.Strings.ShowHentaiPregnancyConfigStrings(2)
 			if Remainder > 24
+				;postpregnancy days left
 				Remainder = Remainder / 24
 				TimeDesc = hentaiPregnancyQuest.Strings.ShowHentaiPregnancyConfigStrings(1) + hentaiPregnancyQuest.Strings.ShowHentaiPregnancyConfigStrings(2)
 			endif
-		elseif Remainder > 24
-			Remainder = Remainder / 24
-			TimeDesc = hentaiPregnancyQuest.Strings.ShowHentaiPregnancyConfigStrings(1)
 		endif
-		if Remainder > 0
-			plist[j] = hentaiPregnancyQuest.PregnantActors[i].getMother().GetLeveledActorBase().GetName() + hentaiPregnancyQuest.Strings.ShowHentaiPregnancyConfigStrings(3) + hentaiPregnancyQuest.PregnantActors[i].getFather().GetLeveledActorBase().GetName() + " " + Remainder + TimeDesc
-			j += 1
-		endIf
+		;(post)postpregnancy days, hours left
+		plist[i] = hentaiPregnancyQuest.PregnantActors[i].getMother().GetLeveledActorBase().GetName() + hentaiPregnancyQuest.Strings.ShowHentaiPregnancyConfigStrings(3) + hentaiPregnancyQuest.PregnantActors[i].getFather().GetLeveledActorBase().GetName() + " ~ " + Remainder + TimeDesc
 		i += 1
 	endWhile
 	return plist

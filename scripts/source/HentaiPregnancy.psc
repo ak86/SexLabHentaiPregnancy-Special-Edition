@@ -195,6 +195,7 @@ int function isMotherPregnant(Actor actorToTest)
 endFunction
 
 bool function isNotPregnant(Actor actorToTest)
+	;cuminflation/postpregnancy state
 	int i = 0
 	while i < PregnantActors.Length
 		if PregnantActors[i].getState() != "ReadyForPregnancy" && PregnantActors[i].getMother() == actorToTest
@@ -220,32 +221,47 @@ endFunction
 function UpdateSize()
 	int i = 0
 	while i < PregnantActors.Length
-		if PregnantActors[i].getMother() != none 
+		if PregnantActors[i].getMother() != none
+			PregnantActors[i].targetSizeCalc()
 			PregnantActors[i].recheckBody()
 		endIf
 		i += 1
 	endWhile
-	Debug.Notification("update")
+endFunction
+
+function UpdateBreastScaling()
+	int i = 0
+	while i < PregnantActors.Length
+		if PregnantActors[i].getMother() != none
+			PregnantActors[i].setBreastScaling()
+		endIf
+		i += 1
+	endWhile
+endFunction
+
+function UpdateBellyScaling()
+	int i = 0
+	while i < PregnantActors.Length
+		if PregnantActors[i].getMother() != none
+			PregnantActors[i].setBellyScaling()
+		endIf
+		i += 1
+	endWhile
+endFunction
+
+bool function ResetScaling()
+	int i = 0
+	while i < PregnantActors.Length
+		if PregnantActors[i].getMother() != none
+			ResetBody(PregnantActors[i].getMother())
+		endIf
+		i += 1
+	endWhile
+	return true
 endFunction
 
 bool function setPregnant(Actor father, Actor mother, bool isvictim, bool fertilised)
 	bool ispregnant = false
-	bool BreastScaling = true
-	bool BellyScaling = true
-	
-	;Skeleton check	
-	if !NetImmerse.HasNode(mother, "NPC L Breast", false)
-		Debug.Notification("HP:" + mother.GetLeveledActorBase().GetName() + Strings.ShowHentaiPregnancyStrings(5))
-		BreastScaling = false
-	endIf
-	if !NetImmerse.HasNode(mother, "NPC R Breast", false)
-		Debug.Notification("HP:" + mother.GetLeveledActorBase().GetName() + Strings.ShowHentaiPregnancyStrings(6))
-		BreastScaling = false
-	endIf
-	if !NetImmerse.HasNode(mother, "NPC Belly", false)
-		Debug.Notification("HP:" + mother.GetLeveledActorBase().GetName() + Strings.ShowHentaiPregnancyStrings(7))
-		BellyScaling = false
-	endIf
 
 	;Disable fertilisation(pregnancy) if target already pregnant with below mods, cuminflation will still work
 	;Estrus Chaurus+
@@ -282,8 +298,6 @@ bool function setPregnant(Actor father, Actor mother, bool isvictim, bool fertil
 					pregnancy.ForceRefTo(mother)
 					pregnancy.setFather(father)
 					pregnancy.setFatherIsCreature(father.HasKeyword( Game.GetFormFromFile(0x13795, "Skyrim.esm") as Keyword ) || father.HasKeyword( Game.GetFormFromFile(0x13798, "Skyrim.esm") as Keyword ))
-					pregnancy.setBreastScaling(BreastScaling)
-					pregnancy.setBellyScaling(BellyScaling)
 					pregnancy.setFertilised(fertilised)
 					pregnancy.setIsVictim(isvictim)
 					pregnancy.GoToState("Inseminated")
@@ -486,8 +500,12 @@ function endPregnancy(Actor ActorRef, int pregnancyId, bool isvictim, int durati
 		SexLab.PickVoice(ActorRef).Moan(ActorRef, 1, isvictim)
 
 		Utility.Wait( 15.0 )
+;		if(pregnancyId > -1)
+;			HentaiPregnantActorAlias pregnancy = getPregnancyWithID(pregnancyID)
+;			pregnancy.deflateBelly()
+;		endif
 		
-		if(config.ChildChance != 0 && pregnancyId > -1)
+		if(config.ChildChance != 0 && pregnancyId > -1); && duration != 0 
 			random = Utility.RandomInt(0, 100)
 			Int chance = config.ChildChance
 			if( random < chance)

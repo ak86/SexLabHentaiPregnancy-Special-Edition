@@ -58,13 +58,6 @@ auto State ReadyForPregnancy
 	endEvent
 EndState
 
-function setBreastScaling(bool value)
-	BreastScaling = value
-endFunction
-
-function setBellyScaling(bool value)
-	BellyScaling = value
-endFunction
 function setIsVictim(bool victim)
 	isvictim = victim
 endFunction
@@ -146,23 +139,18 @@ endFunction
 function incrSize()
 	if ( CurrentBreastSize < TargetBreastSize) && BreastScaling
 		CurrentBreastSize += IncrBreastRate
-		if HentaiP.config.BreastScaling 
-			HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC L Breast", CurrentBreastSize)
-			HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC R Breast", CurrentBreastSize)
-		EndIf
+		HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC L Breast", CurrentBreastSize)
+		HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC R Breast", CurrentBreastSize)
 	endIf
+	
 	if ( CurrentBellySize < TargetBellySize) && BellyScaling
-		if !HentaiP.config.SoulGemPregnancy
+		if SoulGemCount == 0
 			CurrentBellySize += IncrBellyRate
-			if HentaiP.config.BellyScaling
-				HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC Belly", CurrentBellySize)
-			EndIf
+			HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC Belly", CurrentBellySize)
 		Else
 			if ( CurrentBellySize < HentaiP.config.SoulGemBellySize * SoulGemCount)
 				CurrentBellySize += IncrBellyRate
-				if HentaiP.config.BellyScaling
-					HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC Belly", CurrentBellySize)
-				EndIf
+				HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC Belly", CurrentBellySize)
 			EndIf
 		EndIf
 	endIf	
@@ -170,55 +158,107 @@ endFunction
 
 function decrSizeBreast()
 	if BreastScaling
-		if ( CurrentBreastSize > 1)
+		if CurrentBreastSize > 1
 			CurrentBreastSize -= IncrBreastRate
-			if HentaiP.config.BreastScaling 
-				HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC L Breast", CurrentBreastSize)
-				HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC R Breast", CurrentBreastSize)
-			EndIf
+			HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC L Breast", CurrentBreastSize)
+			HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC R Breast", CurrentBreastSize)
 		endIf
 		if CurrentBreastSize <= 1
 			CurrentBreastSize = 1
-			if HentaiP.config.BreastScaling 
-				HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC L Breast", 1)
-				HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC R Breast", 1)
-			EndIf
+			HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC L Breast", 1)
+			HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC R Breast", 1)
 		EndIf
 	EndIf
 endFunction
 
+bool function deflateBelly()
+	While CurrentBellySize > 1
+		decrSizeBelly()
+		Utility.Wait(0.1)
+	EndWhile
+	return true
+endFunction
+
 function decrSizeBelly()
 	if BellyScaling
-		if ( CurrentBellySize > 1)
-			CurrentBellySize -= IncrBellyRate
-			if HentaiP.config.BellyScaling 
-				HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC Belly", CurrentBellySize)
-			EndIf
+		if CurrentBellySize > 1
+			CurrentBellySize -= 0.1
+			HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC Belly", CurrentBellySize)
 		endIf
 		if CurrentBellySize <= 1
 			CurrentBellySize = 1
-			if HentaiP.config.BellyScaling 
-				HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC Belly", 1)
-			EndIf
+			HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC Belly", 1)
 		EndIf
 	EndIf
 endFunction
 
 ; called on player load game/changecell to refresh body, usefull when using NIE scaling
 function recheckBody()
-	if HentaiP.config.BellyScaling 
+	if BellyScaling
+		If CurrentBellySize > TargetBellySize
+			CurrentBellySize = TargetBellySize
+		endIf
 		HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC Belly", CurrentBellySize)
 	EndIf
-	if HentaiP.config.BreastScaling 
+	if BreastScaling 
+		If CurrentBreastSize > TargetBreastSize
+			CurrentBreastSize = TargetBreastSize
+		endIf
 		HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC L Breast", CurrentBreastSize)
 		HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC R Breast", CurrentBreastSize)
 	EndIf
+endFunction
+
+bool function targetSizeCalc()
+	int DurationDays = HentaiP.config.PregnancyDuration
+	TargetBreastSize = HentaiP.config.MaxScaleBreasts
+	TargetBellySize = HentaiP.config.MaxScaleBelly	
+	
+	float BreastSizeDelta = TargetBreastSize - CurrentBreastSize
+	float BellySizeDelt = TargetBellySize - CurrentBellySize
+	DurationHours = (DurationDays * 24 * (1 - Utility.RandomFloat(-0.1, 0.1))) as int
+	IncrBreastRate = BreastSizeDelta / (DurationHours / 2)
+	IncrBellyRate = BellySizeDelt / (DurationHours / 2)
+	
+	return true
+endFunction
+
+function setBreastScaling(bool value = true)
+	;Skeleton check	
+	if !NetImmerse.HasNode(ActorRef, "NPC L Breast", false)
+		Debug.Notification("HP:" + ActorRef.GetLeveledActorBase().GetName() + HentaiP.Strings.ShowHentaiPregnancyStrings(5))
+		value = false
+	endIf
+	if !NetImmerse.HasNode(ActorRef, "NPC R Breast", false)
+		Debug.Notification("HP:" + ActorRef.GetLeveledActorBase().GetName() + HentaiP.Strings.ShowHentaiPregnancyStrings(6))
+		value = false
+	endIf
+	if !HentaiP.config.BreastScaling
+		value = false
+	endIf
+	
+	BreastScaling = value
+endFunction
+
+function setBellyScaling(bool value = true)
+	;Skeleton check	
+	if !NetImmerse.HasNode(ActorRef, "NPC Belly", false)
+		Debug.Notification("HP:" + ActorRef.GetLeveledActorBase().GetName() + HentaiP.Strings.ShowHentaiPregnancyStrings(7))
+		value = false
+	endIf
+	if !HentaiP.config.BellyScaling
+		value = false
+	endIf
+	
+	BellyScaling = value
 endFunction
 
 State Inseminated
 	Event OnBeginState()
 		ActorRef = GetActorRef()
 		ActorRef.AddToFaction(HentaiP.HentaiPregnantFaction)
+		setBreastScaling()
+		setBellyScaling()
 	
 		int random = Utility.RandomInt(0, 100)
 		int chance = HentaiP.config.CumInflationChance
@@ -232,7 +272,8 @@ State Inseminated
 	EndEvent
 	
 	event OnDeath(Actor akKiller)
-		GoToState("PregnancyEnded")
+		HentaiP.ResetBody(ActorRef)
+		GoToState("ReadyForPregnancy")
 	EndEvent	
 EndState
 
@@ -244,7 +285,6 @@ State CumInflated
 			GetActorRef().SetFactionRank(HentaiP.HentaiPregnantFaction, 1)
 		endif
 
-		CurrentBellySize = 1
 		TargetBellySize = HentaiP.config.MaxScaleBelly * 0.25
 		
 		While CurrentBellySize < TargetBellySize && BellyScaling
@@ -260,30 +300,29 @@ State CumInflated
 	EndEvent
 	
 	Event OnUpdateGameTime()
-		UnregisterForUpdate()
-		if fertilised
-			GoToState("Pregnant")
-		else
-			HentaiP.endPregnancy(ActorRef, -1, isvictim, 1)
-			GoToState("ReadyForPregnancy")
-		endIf
+		RegisterForSingleUpdate(5)
 	EndEvent
 		
+	Event OnUpdate()
+		If (!ActorRef.IsInCombat() && !ActorRef.IsInFaction(HentaiP.SexLab.AnimatingFaction))
+			if fertilised
+				GoToState("Pregnant")
+			else
+				HentaiP.endPregnancy(ActorRef, pregnancyID, isvictim, 0)
+				GoToState("ReadyForPregnancy")
+			endIf
+		Else
+			RegisterForSingleUpdate(5)
+		EndIf
+	EndEvent
+
 	event OnEndState()
-		While CurrentBellySize > 1 && BellyScaling
-			if CurrentBellySize > 1
-				CurrentBellySize -= 0.1
-				if HentaiP.config.BellyScaling 
-					HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC Belly", CurrentBellySize)
-				EndIf
-			EndIf
-			Utility.Wait(0.1)
-		EndWhile
+		deflateBelly()
 		HentaiP.ResetBody(ActorRef)
 	endEvent
 	
 	event OnDeath(Actor akKiller)
-		GoToState("PregnancyEnded")
+		GoToState("ReadyForPregnancy")
 	EndEvent	
 EndState
 
@@ -292,19 +331,10 @@ State Pregnant
 		ActorRef = GetActorRef()
 		GetActorRef().SetFactionRank(HentaiP.HentaiPregnantFaction, 3)
 		;Debug.Notification("HentaiPregnantActorAlias Pregnant")
-		int DurationDays = HentaiP.config.PregnancyDuration
 		
 		CurrentBellySize = 1
 		CurrentBreastSize = 1
-		TargetBreastSize = HentaiP.config.MaxScaleBreasts
-		TargetBellySize = HentaiP.config.MaxScaleBelly	
-		
-		float BreastSizeDelta = TargetBreastSize - CurrentBreastSize
-		float BellySizeDelt = TargetBellySize - CurrentBellySize
-		DurationHours = (DurationDays * 24 * (1 - Utility.RandomFloat(-0.1, 0.1))) as int
-		IncrBreastRate = BreastSizeDelta / (DurationHours / 2)
-		IncrBellyRate = BellySizeDelt / (DurationHours / 2)
-		
+		targetSizeCalc()
 		lastGameTime = Utility.GetCurrentGameTime()
 
 		RegisterForSingleUpdateGameTime(1)
@@ -319,7 +349,7 @@ State Pregnant
 			float hourspassedfloat = (currentTime - lastGameTime) * 24
 			int hourspassed = hourspassedfloat as int
 			;Debug.Notification("Hours passed " + hourspassed)	
-			if(hourspassed<=0)
+			if (hourspassed <=0)
 				hourspassed = 1
 			endif
 			CurrentHour += hourspassed
@@ -366,49 +396,62 @@ State Pregnant
 			UnregisterForUpdate()
 			GoToState("PregnancyEnded")
 		EndIf
-	EndEvent		
+	EndEvent
+
+	event OnEndState()
+		deflateBelly()
+	endEvent
 	
 	event OnDeath(Actor akKiller)
-		GoToState("PregnancyEnded")
+		HentaiP.ResetBody(ActorRef)
+		GoToState("ReadyForPregnancy")
 	EndEvent	
 EndState
 
 State SoulGemBirth
 	Event OnBeginState()
 		;Debug.Notification("HentaiPregnantActorAlias PregnancyEnded")
-		
-		while ( ActorRef.IsOnMount() )
-			ActorRef.Dismount()
-			Utility.Wait( 2.0 )
-		endWhile		
-	
-		HentaiP.endPregnancy(ActorRef, -1, isvictim, CurrentHour)
-		HentaiP.SoulGemBirth(pregnancyID, durationHours)
-		GoToState("PostPregnancy")
+		GoToState("PregnancyEnded")
 	EndEvent
 EndState
 
 State PregnancyEnded
 	Event OnBeginState()
-		;Debug.Notification("HentaiPregnantActorAlias PregnancyEnded")
-		
-		while ( ActorRef.IsOnMount() )
-			ActorRef.Dismount()
-			Utility.Wait( 2.0 )
-		endWhile
-		
-		if SoulGemCount == 0
-			HentaiP.endPregnancy(ActorRef, pregnancyId, isvictim, CurrentHour)
-			GoToState("PostPregnancy")
-		else
-			if ActorRef.HasSpell(HentaiP.HentaiSoulgemBirthSpell)
-				ActorRef.RemoveSpell(HentaiP.HentaiSoulgemBirthSpell)
-			EndIf
-			GoToState("SoulGemBirth")
-		endif
+;		Debug.Notification("HentaiPregnantActorAlias PregnancyEnded")
+		RegisterForSingleUpdate(5)
+;		Debug.Notification("PregnancyEnded OnBeginState")
+	EndEvent
+	
+	Event OnUpdate()
+;		Debug.Notification("PregnancyEnded OnUpdate")
+		If (!ActorRef.IsInCombat() && !ActorRef.IsInFaction(HentaiP.SexLab.AnimatingFaction))
+			while ( ActorRef.IsOnMount() )
+				ActorRef.Dismount()
+				Utility.Wait( 2.0 )
+			endWhile
+			
+;			Debug.Notification("PregnancyEnded rdy for birth")
+			if SoulGemCount == 0
+;				Debug.Notification("PregnancyEnded normal birth")
+				HentaiP.endPregnancy(ActorRef, pregnancyId, isvictim, CurrentHour)
+				GoToState("PostPregnancy")
+			else
+;				Debug.Notification("PregnancyEnded SoulGem birth")
+				if ActorRef.HasSpell(HentaiP.HentaiSoulgemBirthSpell)
+					ActorRef.RemoveSpell(HentaiP.HentaiSoulgemBirthSpell)
+				EndIf
+				HentaiP.endPregnancy(ActorRef, -1, isvictim, CurrentHour)
+				HentaiP.SoulGemBirth(pregnancyID, durationHours)
+				GoToState("PostPregnancy")
+			endif
+		Else
+;			Debug.Notification("PregnancyEnded actor in combat or animating, retry in 5 sec")
+			RegisterForSingleUpdate(5)
+		EndIf
 	EndEvent
 	
 	event OnEndState()
+		deflateBelly()
 		Debug.Notification(ActorRef.GetDisplayName() + HentaiP.Strings.ShowHentaiPregnantActorAliasStrings(2))
 	endEvent	
 EndState
@@ -417,17 +460,11 @@ State PostPregnancy
 	Event OnBeginState()
 		int DurationDays = HentaiP.config.PregnancyDuration
 		float BreastSizeDelta = CurrentBreastSize - 1
-		float BellySizeDelt = CurrentBellySize - 1
 		PostDurationHours = (CurrentHour * 0.2 * (1 - Utility.RandomFloat(-0.1, 0.1))) as int
 		PostDurationHours += CurrentHour
 		IncrBreastRate = BreastSizeDelta / PostDurationHours
-		IncrBellyRate = BellySizeDelt / PostDurationHours
 		
 		lastGameTime = Utility.GetCurrentGameTime()
-		While CurrentBellySize > 1
-			decrSizeBelly()
-			Utility.Wait(0.1)
-		EndWhile
 		
 		RegisterForSingleUpdateGameTime(1)
 	EndEvent
@@ -502,7 +539,8 @@ State ClearPregnancy
 			;Debug.notification(HentaiP.config.translateString("$HP_HentaiPregnantActorAliasNotifications6{" + ActorRef.GetDisplayName() + "}"))
 			;HentaiP.config.translateString("$HP_HentaiPregnantActorAliasNotifications6{" + ActorRef.GetDisplayName() + "}")
 		endif
-	endEvent	
+	endEvent
+	
 	event OnUpdate()
 		; catch any pending updates
 	endEvent	

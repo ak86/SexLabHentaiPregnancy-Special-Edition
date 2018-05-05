@@ -3,7 +3,7 @@ Scriptname HentaiMilkSquirtEffect extends ActiveMagicEffect
 Event OnEffectStart(Actor Target, Actor Caster)
 	HentaiPregnancy HentaiP = Quest.GetQuest("HentaiPregnancyQuest") as HentaiPregnancy
 	
-	If (!Caster.IsInCombat() && !Caster.IsOnMount())
+	If (!Caster.IsInCombat() && !Caster.IsOnMount() && !Caster.IsInFaction(HentaiP.SexLab.AnimatingFaction))
 		if (Caster.IsWeaponDrawn())
 			Caster.SheatheWeapon()
 		endIf
