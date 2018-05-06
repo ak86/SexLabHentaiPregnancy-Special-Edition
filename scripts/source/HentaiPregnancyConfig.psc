@@ -50,7 +50,7 @@ int OIDAllowAnal
 bool Property AllowAnal = false Auto Hidden
 
 int OIDAllowNonUnique
-bool Property AllowNonUnique = false Auto Hidden
+bool Property AllowNonUnique = true Auto Hidden
 
 int OIDBreastScaling
 bool Property BreastScaling = true Auto Hidden
@@ -593,27 +593,30 @@ endEvent
 
 string[] function getPregnancyList()
 	string[] plist = new string[50]
+	OIDClearSinglePregnancy = new int[50]
 	int i = 0
 	while i < hentaiPregnancyQuest.PregnantActors.Length
-		;pregnancy hours left
-		int Remainder = hentaiPregnancyQuest.PregnantActors[i].getDurationHours() - hentaiPregnancyQuest.PregnantActors[i].getCurrentHour()
-		string TimeDesc = hentaiPregnancyQuest.Strings.ShowHentaiPregnancyConfigStrings(0)
-		if Remainder > 24
-			;pregnancy days left
-			Remainder = Remainder / 24
-			TimeDesc = hentaiPregnancyQuest.Strings.ShowHentaiPregnancyConfigStrings(1)
-		elseif hentaiPregnancyQuest.PregnantActors[i].getState() == "PostPregnancy"
-			;postpregnancy hours left
-			Remainder = Remainder + hentaiPregnancyQuest.PregnantActors[i].getPostDurationHours()
-			TimeDesc += hentaiPregnancyQuest.Strings.ShowHentaiPregnancyConfigStrings(2)
+		if hentaiPregnancyQuest.PregnantActors[i].GetActorRef() != none
+			;pregnancy hours left
+			int Remainder = hentaiPregnancyQuest.PregnantActors[i].getDurationHours() - hentaiPregnancyQuest.PregnantActors[i].getCurrentHour()
+			string TimeDesc = hentaiPregnancyQuest.Strings.ShowHentaiPregnancyConfigStrings(0)
 			if Remainder > 24
-				;postpregnancy days left
+				;pregnancy days left
 				Remainder = Remainder / 24
-				TimeDesc = hentaiPregnancyQuest.Strings.ShowHentaiPregnancyConfigStrings(1) + hentaiPregnancyQuest.Strings.ShowHentaiPregnancyConfigStrings(2)
+				TimeDesc = hentaiPregnancyQuest.Strings.ShowHentaiPregnancyConfigStrings(1)
+			elseif hentaiPregnancyQuest.PregnantActors[i].getState() == "PostPregnancy"
+				;postpregnancy hours left
+				Remainder = Remainder + hentaiPregnancyQuest.PregnantActors[i].getPostDurationHours()
+				TimeDesc += hentaiPregnancyQuest.Strings.ShowHentaiPregnancyConfigStrings(2)
+				if Remainder > 24
+					;postpregnancy days left
+					Remainder = Remainder / 24
+					TimeDesc = hentaiPregnancyQuest.Strings.ShowHentaiPregnancyConfigStrings(1) + hentaiPregnancyQuest.Strings.ShowHentaiPregnancyConfigStrings(2)
+				endif
 			endif
+			;(post)postpregnancy days, hours left
+			plist[i] = hentaiPregnancyQuest.PregnantActors[i].getMother().GetLeveledActorBase().GetName() + hentaiPregnancyQuest.Strings.ShowHentaiPregnancyConfigStrings(3) + hentaiPregnancyQuest.PregnantActors[i].getFather().GetLeveledActorBase().GetName() + " ~ " + Remainder + TimeDesc
 		endif
-		;(post)postpregnancy days, hours left
-		plist[i] = hentaiPregnancyQuest.PregnantActors[i].getMother().GetLeveledActorBase().GetName() + hentaiPregnancyQuest.Strings.ShowHentaiPregnancyConfigStrings(3) + hentaiPregnancyQuest.PregnantActors[i].getFather().GetLeveledActorBase().GetName() + " ~ " + Remainder + TimeDesc
 		i += 1
 	endWhile
 	return plist
