@@ -115,12 +115,25 @@ int function getPostDurationHours()
 endFunction
 
 int function getMilk()
+	if ActorRef.GetFactionRank(HentaiP.HentaiLactatingFaction) < 0
+		setMilk(0)
+	endif
+	Milk = ActorRef.GetFactionRank(HentaiP.HentaiLactatingFaction)
 	return Milk
 endFunction
 
 int function setMilk(int i)
 	Milk = i
-	ActorRef.AddToFaction(HentaiP.HentaiLactatingFaction)
+	if Milk < 0
+		Milk = 0
+	elseif Milk > 100	;maxfactionrank is 127
+		Milk = 100
+	endif
+	
+	if Milk > CurrentBreastSize && BreastScaling
+		Milk = Math.Floor(CurrentBreastSize)
+	endif
+	
 	ActorRef.SetFactionRank(HentaiP.HentaiLactatingFaction, Milk)
 	return Milk
 endFunction
@@ -132,6 +145,10 @@ endFunction
 int function setSoulGemCount(int i)
 	if SoulGemCount + i <= HentaiP.config.SoulGemsMax
 		SoulGemCount = i
+	else
+		if HentaiP.config.EnableMessages
+			Debug.Notification(ActorRef.GetDisplayName() + HentaiP.Strings.ShowHentaiPregnantActorAliasStrings(6))
+		EndIf
 	endIf
 	return SoulGemCount
 endFunction
@@ -209,14 +226,19 @@ function recheckBody()
 	EndIf
 endFunction
 
-bool function targetSizeCalc()
+bool function PregDurationCalc()
 	int DurationDays = HentaiP.config.PregnancyDuration
+	DurationHours = (DurationDays * 24 * (1 - Utility.RandomFloat(-0.1, 0.1))) as int
+	
+	return true
+endFunction
+
+bool function targetSizeCalc()
 	TargetBreastSize = HentaiP.config.MaxScaleBreasts
 	TargetBellySize = HentaiP.config.MaxScaleBelly	
 	
 	float BreastSizeDelta = TargetBreastSize - CurrentBreastSize
 	float BellySizeDelt = TargetBellySize - CurrentBellySize
-	DurationHours = (DurationDays * 24 * (1 - Utility.RandomFloat(-0.1, 0.1))) as int
 	IncrBreastRate = BreastSizeDelta / (DurationHours / 2)
 	IncrBellyRate = BellySizeDelt / (DurationHours / 2)
 	
@@ -334,9 +356,11 @@ State Pregnant
 		
 		CurrentBellySize = 1
 		CurrentBreastSize = 1
+		PregDurationCalc()
 		targetSizeCalc()
 		lastGameTime = Utility.GetCurrentGameTime()
 
+		HentaiP.SoulGemImpregnation(pregnancyID)
 		RegisterForSingleUpdateGameTime(1)
 	EndEvent
 	
@@ -371,7 +395,9 @@ State Pregnant
 				If CurrentHour >= DurationHours/3 && HentaiP.config.Milking
 					;hand milking
 					if !ActorRef.HasSpell(HentaiP.HentaiMilkSquirtSpellList.GetAt(0) as Spell)
-						Debug.Notification(HentaiP.Strings.ShowHentaiPregnantActorAliasStrings(0))
+						if HentaiP.config.EnableMessages
+							Debug.Notification(HentaiP.Strings.ShowHentaiPregnantActorAliasStrings(0))
+						EndIf
 						ActorRef.Addspell(HentaiP.HentaiMilkSquirtSpellList.GetAt(0) as Spell)
 					EndIf
 					;bottle milking; req HF
@@ -382,9 +408,11 @@ State Pregnant
 			EndIf
 			
 			If CurrentHour > DurationHours/3 && HentaiP.config.Milking
-				setMilk(Milk + 1)
+				setMilk(getMilk() + 1)
 				If ActorRef == HentaiP.PlayerRef
-					Debug.Notification(HentaiP.Strings.ShowHentaiPregnantActorAliasStrings(1))
+					if HentaiP.config.EnableMessages
+						Debug.Notification(HentaiP.Strings.ShowHentaiPregnantActorAliasStrings(1))
+					EndIf
 				Elseif HentaiP.config.NPCMilking
 					(HentaiP.HentaiMilkSquirtSpellList.GetAt(1) as Spell).Cast(ActorRef, ActorRef)
 				EndIf
@@ -452,7 +480,9 @@ State PregnancyEnded
 	
 	event OnEndState()
 		deflateBelly()
-		Debug.Notification(ActorRef.GetDisplayName() + HentaiP.Strings.ShowHentaiPregnantActorAliasStrings(2))
+		if HentaiP.config.EnableMessages
+			Debug.Notification(ActorRef.GetDisplayName() + HentaiP.Strings.ShowHentaiPregnantActorAliasStrings(2))
+		EndIf
 	endEvent	
 EndState
 
@@ -489,9 +519,11 @@ State PostPregnancy
 			lastGameTime = currentTime
 			
 			If CurrentHour+PostDurationHours/3 < PostDurationHours && HentaiP.config.Milking
-				setMilk(Milk + 1)
+				setMilk(getMilk() + 1)
 				If ActorRef == HentaiP.PlayerRef
-					Debug.Notification(HentaiP.Strings.ShowHentaiPregnantActorAliasStrings(1))
+					if HentaiP.config.EnableMessages
+						Debug.Notification(HentaiP.Strings.ShowHentaiPregnantActorAliasStrings(1))
+					EndIf
 				Elseif HentaiP.config.NPCMilking
 					(HentaiP.HentaiMilkSquirtSpellList.GetAt(1) as Spell).Cast(ActorRef, ActorRef)
 				EndIf
@@ -521,7 +553,9 @@ State ClearPregnancy
 			
 		if ActorRef == HentaiP.PlayerRef
 			if ActorRef.HasSpell(HentaiP.HentaiMilkSquirtSpellList.GetAt(0) as Spell)
-				Debug.Notification(HentaiP.Strings.ShowHentaiPregnantActorAliasStrings(4))
+				if HentaiP.config.EnableMessages
+					Debug.Notification(HentaiP.Strings.ShowHentaiPregnantActorAliasStrings(4))
+				EndIf
 				ActorRef.RemoveSpell(HentaiP.HentaiMilkSquirtSpellList.GetAt(0) as Spell)
 			EndIf
 			if ActorRef.HasSpell(HentaiP.HentaiMilkSquirtSpellList.GetAt(1) as Spell)
