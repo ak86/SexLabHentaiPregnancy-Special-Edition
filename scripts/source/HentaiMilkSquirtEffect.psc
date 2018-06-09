@@ -21,7 +21,18 @@ Event OnEffectStart(Actor Target, Actor Caster)
 		Debug.SendAnimationEvent(Caster,"hentaipregnancyZaZAPCHorFC")
 		
 		if Caster.GetFactionRank(HentaiP.HentaiLactatingFaction) > 0
-			Caster.ModFactionRank(HentaiP.HentaiLactatingFaction, -1)
+			if(Utility.RandomInt(0, 1) == 1)	
+				HentaiP.playLeftMilkEffect(Caster)
+			else
+				HentaiP.playRightMilkEffect(Caster)
+			endif
+			
+			int howmuchtomilk = 1
+			if HentaiP.config.MilkAll
+				howmuchtomilk = Caster.GetFactionRank(HentaiP.HentaiLactatingFaction)
+			endif
+			
+			Caster.ModFactionRank(HentaiP.HentaiLactatingFaction, -howmuchtomilk)
 			
 			if self.GetBaseObject() != HentaiP.HentaiMilkSquirtSpellEffect && Game.GetModbyName("HearthFires.esm") != 255 
 				If HentaiP.PlayerREF == Caster
@@ -29,19 +40,13 @@ Event OnEffectStart(Actor Target, Actor Caster)
 						Debug.Notification(HentaiP.Strings.ShowHentaiMilkSquirtEffectStrings(0))
 					EndIf
 				EndIf
-				Caster.AddItem(Game.GetFormFromFile(0x3534, "HearthFires.esm"), 1)
+				Caster.AddItem(Game.GetFormFromFile(0x3534, "HearthFires.esm"), howmuchtomilk)
 			else
 				If HentaiP.PlayerREF == Caster
 					if HentaiP.config.EnableMessages
 						Debug.Notification(HentaiP.Strings.ShowHentaiMilkSquirtEffectStrings(1))
 					EndIf
 				EndIf
-			endif
-			
-			if(Utility.RandomInt(0, 1) == 1)	
-				HentaiP.playLeftMilkEffect(Caster)
-			else
-				HentaiP.playRightMilkEffect(Caster)
 			endif
 		else
 			If HentaiP.PlayerREF == Caster
@@ -51,6 +56,20 @@ Event OnEffectStart(Actor Target, Actor Caster)
 			EndIf
 			HentaiP.playNoMilkEffect(Caster)
 		endIf
+		if Caster.GetFactionRank(HentaiP.HentaiLactatingFaction) > 0
+			if HentaiP.PlayerREF == Caster && HentaiP.config.EnableMessages
+				Debug.Notification(HentaiP.Strings.ShowHentaiMilkSquirtEffectStrings(3))
+			EndIf
+		EndIf
+		
+		int i = 0
+		while i < HentaiP.PregnantActors.Length
+				if HentaiP.PregnantActors[i].GetActorRef() == Caster
+					HentaiP.PregnantActors[i].setMilk(HentaiP.PregnantActors[i].getMilk())
+					i = HentaiP.PregnantActors.Length
+				endIf
+			i += 1
+		endWhile
 		
 		Debug.SendAnimationEvent(Caster, "IdleForceDefaultState")
 		

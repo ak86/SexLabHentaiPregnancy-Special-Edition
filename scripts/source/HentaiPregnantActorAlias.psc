@@ -15,6 +15,7 @@ Int pregnancyId = -1
 Int DurationHours = 0
 Int PostDurationHours = 0
 Int CurrentHour = 0
+Int SoulGemStartHour = 0
 Int Milk = 0
 Int SoulGemCount = 0
 
@@ -40,6 +41,7 @@ auto State ReadyForPregnancy
 			ActorRef.RemoveFromFaction(HentaiP.HentaiLactatingFaction)
 		endif
 		CurrentHour = 0
+		SoulGemStartHour = 0
 		ActorRef = none
 		FatherRef = none
 		lastGameTime = 0.0
@@ -98,6 +100,18 @@ int function getCurrentHour()
 	return CurrentHour
 endFunction
 
+int function getSoulGemStartHour()
+	return SoulGemStartHour
+endFunction
+
+int function setSoulGemStartHour()
+	if SoulGemCount == 0
+		SoulGemStartHour = 0
+	elseif SoulGemStartHour == 0
+		SoulGemStartHour = CurrentHour
+	endif
+endFunction
+
 int function getId()
 	return pregnancyId
 endFunction
@@ -135,6 +149,7 @@ int function setMilk(int i)
 	endif
 	
 	ActorRef.SetFactionRank(HentaiP.HentaiLactatingFaction, Milk)
+	updateMilkBreastSize()
 	return Milk
 endFunction
 
@@ -150,6 +165,7 @@ int function setSoulGemCount(int i)
 			Debug.Notification(ActorRef.GetDisplayName() + HentaiP.Strings.ShowHentaiPregnantActorAliasStrings(6))
 		EndIf
 	endIf
+	setSoulGemStartHour()
 	return SoulGemCount
 endFunction
 
@@ -171,6 +187,15 @@ function incrSize()
 			EndIf
 		EndIf
 	endIf	
+endFunction
+
+function updateMilkBreastSize()
+	if BreastScaling
+		;current size, how much can increase to max size, size per milk, milk amount
+		float MilkBreastSize = CurrentBreastSize + ((TargetBreastSize-CurrentBreastSize) / TargetBreastSize) * Milk
+		HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC L Breast", MilkBreastSize)
+		HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC R Breast", MilkBreastSize)
+	endIf
 endFunction
 
 function decrSizeBreast()
@@ -223,6 +248,7 @@ function recheckBody()
 		endIf
 		HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC L Breast", CurrentBreastSize)
 		HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC R Breast", CurrentBreastSize)
+		updateMilkBreastSize()
 	EndIf
 endFunction
 
@@ -360,7 +386,7 @@ State Pregnant
 		targetSizeCalc()
 		lastGameTime = Utility.GetCurrentGameTime()
 
-		HentaiP.SoulGemImpregnation(pregnancyID)
+		HentaiP.SoulGemImpregnation(pregnancyID, FatherRef)
 		RegisterForSingleUpdateGameTime(1)
 	EndEvent
 	
@@ -469,7 +495,7 @@ State PregnancyEnded
 					ActorRef.RemoveSpell(HentaiP.HentaiSoulgemBirthSpell)
 				EndIf
 				HentaiP.endPregnancy(ActorRef, -1, isvictim, CurrentHour)
-				HentaiP.SoulGemBirth(pregnancyID, durationHours)
+				HentaiP.SoulGemBirth(pregnancyID)
 				GoToState("PostPregnancy")
 			endif
 		Else
@@ -530,6 +556,7 @@ State PostPregnancy
 			Else
 				ActorRef.RemoveFromFaction(HentaiP.HentaiLactatingFaction)
 			EndIf
+			;old milking, disabled
 			;HentaiP.addTempPostPregnancyEffects(ActorRef, PostDurationHours - CurrentHour)
 			
 			RegisterForSingleUpdateGameTime(1)

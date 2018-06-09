@@ -294,6 +294,23 @@ function addTempPregnancyEffects(Actor ActorRef, int hoursleft, bool isvictim)
 	endif
 endFunction
 
+function addTempPostPregnancyEffects(Actor ActorRef, int hoursleft)
+	if( hoursleft > 0 && config.PostPregnancyEffects)		
+		int random = Utility.RandomInt(0, 9)
+		if(random < 5)	
+			Utility.Wait(random)
+			random = Utility.RandomInt(0, 9)
+
+			if(random < 5)	
+				playLeftMilkEffect(ActorRef)
+			else
+				playRightMilkEffect(ActorRef)
+			endif
+			
+		endif	
+	endif
+endFunction
+
 function playMilkLeak(Actor ActorRef, int duration)
 	if(config.BodyTypeOption == 2)
 		HentaiPregnancyMilkUNP.play(ActorRef, duration)
@@ -346,23 +363,6 @@ function playRightMilkEffect(Actor ActorRef)
 	
 	EquipItem(ActorRef, stripped, false, false)
 endfunction
-
-function addTempPostPregnancyEffects(Actor ActorRef, int hoursleft)
-	if( hoursleft > 0 && config.PostPregnancyEffects)		
-		int random = Utility.RandomInt(0, 9)
-		if(random < 5)	
-			Utility.Wait(random)
-			random = Utility.RandomInt(0, 9)
-
-			if(random < 5)	
-				playLeftMilkEffect(ActorRef)
-			else
-				playRightMilkEffect(ActorRef)
-			endif
-			
-		endif	
-	endif
-endFunction
 
 form function getBodyItem(actor a)
 	int mask = armor.GetMaskForSlot(32)
@@ -446,7 +446,8 @@ bool function setPregnant(Actor father, Actor mother, bool isvictim, bool fertil
 			int actorIndex = getPregnancyReadyActorsIndex()
 			;Debug.Notification("Pregnant slot availuable " + actorIndex)
 			if(actorIndex > -1)
-				if(PlayerRef != mother || config.PregnancyActorOption == 0)
+				;preg all, npc, pc
+				if(config.PregnancyActorOption == 0 || PlayerRef != mother && config.PregnancyActorOption == 1 || PlayerRef == mother && config.PregnancyActorOption == 2)
 					HentaiPregnantActorAlias pregnancy = PregnantActors[actorIndex]
 					pregnancy.ForceRefTo(mother)
 					pregnancy.setFather(father)
@@ -457,7 +458,7 @@ bool function setPregnant(Actor father, Actor mother, bool isvictim, bool fertil
 					pregnancy.setId(actorIndex)
 					if(fertilised)
 						if config.EnableMessages
-							Debug.Notification(father.GetLeveledActorBase().GetName() + Strings.ShowHentaiPregnancyStrings(1) + mother.GetLeveledActorBase().GetName())
+							Debug.Notification(father.GetDisplayName() + Strings.ShowHentaiPregnancyStrings(1) + mother.GetDisplayName())
 						endif
 						ispregnant = true
 						SendModEvent("HentaiPregnancyImpregnation", actorIndex, pregnancy.getCurrentHour())
@@ -465,7 +466,7 @@ bool function setPregnant(Actor father, Actor mother, bool isvictim, bool fertil
 				endIf
 			endIf
 		elseif (fertilised)
-			SoulGemImpregnation(isMotherPregnant(mother))
+			SoulGemImpregnation(isMotherPregnant(mother), father)
 		endIf
 ;	elseIf mother.AddSpell(HentaiImpregnation, false)
 ;		if config.EnableMessages
@@ -475,58 +476,55 @@ bool function setPregnant(Actor father, Actor mother, bool isvictim, bool fertil
 	return ispregnant
 endFunction
 
-function SoulGemImpregnation(int pregnancyID = -1)
+function SoulGemImpregnation(int pregnancyID = -1, actor father)
 	if config.SoulGemPregnancy && pregnancyID > -1
 		HentaiPregnantActorAlias pregnancy = getPregnancyWithID(pregnancyID)
 		Actor mother = pregnancy.getMother()
-		Actor father = pregnancy.getFather()
-		bool forced = pregnancy.isVictim()
-		if (pregnancy.getFatherIsCreature() || !config.CreaturesOnly)
-			pregnancy.setSoulGemCount( pregnancy.getSoulGemCount() + 1)
+		;bool forced = pregnancy.isVictim()
+		if ((father.HasKeyword( Game.GetFormFromFile(0x13795, "Skyrim.esm") as Keyword ) || father.HasKeyword( Game.GetFormFromFile(0x13798, "Skyrim.esm") as Keyword )) || !config.CreaturesOnly)
 			if config.EnableMessages
-				Debug.Notification(father.GetLeveledActorBase().GetName() + Strings.ShowHentaiPregnancyStrings(3) + mother.GetLeveledActorBase().GetName())
+				Debug.Notification(father.GetDisplayName() + Strings.ShowHentaiPregnancyStrings(3) + mother.GetDisplayName())
 			EndIf
+			pregnancy.setSoulGemCount( pregnancy.getSoulGemCount() + 1)
 		endIf
 	endIf
 endFunction
 
-function SoulGemBirth(int pregnancyID, float durationHours)
+function SoulGemBirth(int pregnancyID)
 	if config.SoulGemPregnancy
 		;safety check, pregnancyID should always be > -1
 		if (pregnancyID > -1)
-
 			HentaiPregnantActorAlias pregnancy = getPregnancyWithID(pregnancyID)
-			Actor mother = pregnancy.getMother()
-		
-			;duration in hours
-			int iPregnancyDuration = durationHours as int
+			form SoulGemType = getSoulGemSize(pregnancyID)
+
+			if SoulGemType != none
+				Actor mother = pregnancy.getMother()
+				mother.addItem(SoulGemType, pregnancy.getSoulGemCount(), true)	
+				pregnancy.setSoulGemCount(0)
 			
-			;safety check, config.SoulGemDuration should always be > 0
-			if config.SoulGemDuration > 0 && (pregnancy.getFatherIsCreature() || !config.CreaturesOnly)
-			
-				float soulGemSize = iPregnancyDuration / config.SoulGemDuration / pregnancy.getSoulGemCount()
-				If soulGemSize > 4 && !pregnancy.getFatherIsCreature()
-					mother.addItem(SoulGemBlackFilled, pregnancy.getSoulGemCount(), true)	
-				elseIf soulGemSize > 4
-					mother.addItem(SoulGemGrandFilled, pregnancy.getSoulGemCount(), true)	
-				elseIf soulGemSize > 3
-					mother.addItem(SoulGemGreaterFilled, pregnancy.getSoulGemCount(), true)
-				elseIf soulGemSize > 2
-					mother.addItem(SoulGemLesserFilled, pregnancy.getSoulGemCount(), true)												
-				elseif soulGemSize > 1
-					mother.addItem(SoulGemPettyFilled, pregnancy.getSoulGemCount(), true)
-				endIf
-				
-				if soulGemSize > 1
-					if config.EnableMessages
-						Debug.Notification(mother.GetLeveledActorBase().GetName() + Strings.ShowHentaiPregnancyStrings(4))
-					EndIf
-				endIf
-			
+				if config.EnableMessages
+					Debug.Notification(mother.GetDisplayName() + Strings.ShowHentaiPregnancyStrings(4))
+				EndIf
 			endIf
-		
 		endIf
 	endIf
+endFunction
+
+form function getSoulGemSize(int pregnancyID)
+	HentaiPregnantActorAlias pregnancy = getPregnancyWithID(pregnancyID)
+	float soulGemSize = (pregnancy.getCurrentHour() - pregnancy.getSoulGemStartHour()) / (config.SoulGemDuration * pregnancy.getSoulGemCount())
+	If soulGemSize > 4 && !pregnancy.getFatherIsCreature()
+		return SoulGemBlackFilled
+	elseIf soulGemSize > 4
+		return SoulGemGrandFilled
+	elseIf soulGemSize > 3
+		return SoulGemGreaterFilled
+	elseIf soulGemSize > 2
+		return SoulGemLesserFilled
+	elseif soulGemSize > 1
+		return SoulGemPettyFilled
+	endIf
+	return none
 endFunction
 
 function endPregnancy(Actor ActorRef, int pregnancyId, bool isvictim, int duration)
@@ -632,8 +630,19 @@ Event OnSexLabStart(String _eventName, String _args, Float _argc, Form _sender)
 			if Game.GetModbyName("HearthFires.esm") != 255 
 				actors[1].equipitem(Game.GetFormFromFile(0x3534, "HearthFires.esm"), true, true)
 			endif
+			int i = 0
+			while i < PregnantActors.Length
+					if PregnantActors[i].GetActorRef() == actors[0]
+						PregnantActors[i].setMilk(PregnantActors[i].getMilk())
+						i = PregnantActors.Length
+					endIf
+				i += 1
+			endWhile
 			if config.EnableMessages
 				Debug.Notification(actors[0].GetDisplayName() + Strings.ShowHentaiPregnancyStrings(8) + actors[1].GetDisplayName())
+				if actors[0].GetFactionRank(HentaiLactatingFaction) > 0
+					Debug.Notification(actors[0].GetDisplayName() +  Strings.ShowHentaiPregnancyStrings(9))
+				endif
 			endif
 		endif
 	endif

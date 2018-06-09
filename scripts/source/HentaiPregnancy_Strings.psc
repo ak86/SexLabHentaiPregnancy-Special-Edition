@@ -19,12 +19,13 @@ Function ResetStrings()
 	HentaiPregnantActorAliasStrings[5] = "'s pregnancy terminated."
 	HentaiPregnantActorAliasStrings[6] = " is full of soul gems, gem seed was absorbed."
 	
-	HentaiMilkSquirtEffectStrings = new string[3]
+	HentaiMilkSquirtEffectStrings = new string[4]
 	HentaiMilkSquirtEffectStrings[0] = "You squirt your delicious breast milk into a jug."
 	HentaiMilkSquirtEffectStrings[1] = "You playfully squirt breast milk everywhere!"
 	HentaiMilkSquirtEffectStrings[2] = "You playfully squeeze breasts, unfortunately they don't have much milk."
+	HentaiMilkSquirtEffectStrings[3] = "Your breasts has some more milk left."
 
-	HentaiPregnancyStrings = new string[9]
+	HentaiPregnancyStrings = new string[10]
 	HentaiPregnancyStrings[0] = "All named pregnancies removed."
 	HentaiPregnancyStrings[1] = " is impregnating "
 	HentaiPregnancyStrings[2] = " is cum inflating "
@@ -34,6 +35,7 @@ Function ResetStrings()
 	HentaiPregnancyStrings[6] = " does not have NPC R Breast, check your skeleton, breast scaling is disabled"
 	HentaiPregnancyStrings[7] = " does not have NPC Belly node, check your skeleton, belly scaling is disabled"
 	HentaiPregnancyStrings[8] = " breastfeeds milk to "
+	HentaiPregnancyStrings[9] = "'s breasts has some more milk left."
 	
 	HentaiPregnancyConfigStrings = new string[4]
 	HentaiPregnancyConfigStrings[0] = "hours left"
