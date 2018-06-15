@@ -86,7 +86,7 @@ HentaiPregnantActorAlias[] Property PregnantActors Auto hidden
 Event OnInit()
 	setUpPregnantActors()
 	RegisterForModEvent("OrgasmStart", "HentaiPregnancyImpregnate")
-	RegisterForModEvent("OrgasmStart", "OnSexLabStart")
+	RegisterForModEvent("AnimationStart", "OnSexLabStart")
 	RegisterForModEvent("SexLabOrgasmSeparate", "HentaiPregnancyImpregnateS")
 	if config.EnableMessages
 		Debug.Notification("Hentai Pregnancy Ready")
@@ -101,7 +101,7 @@ function gameLoaded()
 		setUpPregnantActors()
 	endif
 	RegisterForModEvent("OrgasmStart", "HentaiPregnancyImpregnate")
-	RegisterForModEvent("OrgasmStart", "OnSexLabStart")
+	RegisterForModEvent("AnimationStart", "OnSexLabStart")
 	RegisterForModEvent("SexLabOrgasmSeparate", "HentaiPregnancyImpregnateS")
 	if Strings.getversion() != 1
 		Debug.Notification("HentaiPregnancy translation script outdated")
@@ -627,6 +627,7 @@ Event OnSexLabStart(String _eventName, String _args, Float _argc, Form _sender)
 ;				playRightMilkEffect(actors[0])
 ;			endif
 			actors[0].ModFactionRank(HentaiLactatingFaction, -1)
+			;feed milk jug
 			if Game.GetModbyName("HearthFires.esm") != 255 
 				actors[1].equipitem(Game.GetFormFromFile(0x3534, "HearthFires.esm"), true, true)
 			endif
