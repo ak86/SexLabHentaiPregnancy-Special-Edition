@@ -3,12 +3,6 @@ ScriptName HentaiPregnancyConfig extends SKI_ConfigBase
 HentaiPregnancy Property hentaiPregnancyQuest auto
 
 ; ----- Pregnancy settings -----
-int Property CumInflationChance = 50 Auto Hidden
-int CumInflationChanceDefault = 50
-int OIDCumInflationChance
-
-int OIDCumInflationCreaturesOnly
-bool Property CumInflationCreaturesOnly = true Auto Hidden
 
 int Property PregnancyChance = 15 Auto Hidden
 int PregnancyChanceDefault = 15
@@ -46,6 +40,9 @@ bool Property NPCMilking = true Auto Hidden
 int OIDMilkAll
 bool Property MilkAll = false Auto Hidden
 
+int OIDMilkAllNPC
+bool Property MilkAllNPC = false Auto Hidden
+
 int OIDPostPregnancyEffects
 bool Property PostPregnancyEffects = false Auto Hidden
 
@@ -80,14 +77,61 @@ Float Property MaxScaleBreasts = 2.0 Auto Hidden
 Float MaxScaleBreastsDefault = 2.0
 int OIDMaxScaleBreasts
 
+; ----- Cum Inflation settings -----
+int Property CumInflationChance = 50 Auto Hidden
+int CumInflationChanceDefault = 50
+int OIDCumInflationChance
+
+int OIDCumInflationCreaturesOnly
+bool Property CumInflationCreaturesOnly = true Auto Hidden
+
+int OIDCumInflation
+bool Property CumInflation = true Auto Hidden
+
+Float Property CumSizeBase = 15.0 Auto Hidden
+Float CumSizeBaseDefault = 15.0
+int OIDCumSizeBase
+
+Float Property CumSizeRandomizer = 50.0 Auto Hidden
+Float CumSizeRandomizerDefault = 50.0
+int OIDCumSizeRandomizer
+
+Float Property CumSizeCreatureModifier = 10.0 Auto Hidden
+Float CumSizeCreatureModifierDefault = 10.0
+int OIDCumSizeCreatureModifier
+
+Float Property CumSizeEstrusModifier = 100.0 Auto Hidden
+Float CumSizeEstrusModifierDefault = 100.0
+int OIDCumSizeEstrusModifier
+
+Float Property CumAbsorb = 10.0 Auto Hidden
+Float CumAbsorbDefault = 10.0
+int OIDCumAbsorb
+
+Float Property CumDrain = 10.0 Auto Hidden
+Float CumDrainDefault = 10.0
+int OIDCumDrain
+
+Float Property CumBellySizeMax = 3.5 Auto Hidden
+Float CumBellySizeMaxDefault = 3.5
+int OIDCumBellySizeMax
+
+Float Property CumBellySizeMaxRandomizer = 10.0 Auto Hidden
+Float CumBellySizeMaxRandomizerDefault = 10.0
+int OIDCumBellySizeMaxRandomizer
+
+Float Property CumBellySizePerCum = 1.5 Auto Hidden
+Float CumBellySizePerCumDefault = 1.5
+int OIDCumBellySizePerCum
+
 ; ----- Soul Gem settings -----
 
 int Property SoulGemDuration = 20 Auto Hidden
 int SoulGemDurationDefault = 20
 int OIDSoulGemDuration
 
-int Property SoulGemsMax = 9 Auto Hidden
-int SoulGemsMaxDefault = 9
+int Property SoulGemsMax = 5 Auto Hidden
+int SoulGemsMaxDefault = 5
 int OIDSoulGemsMax
 
 Float Property SoulGemBellySize = 1.0 Auto Hidden
@@ -108,7 +152,7 @@ Event OnConfigInit()
 EndEvent
 
 int function GetVersion()
-	return 20180609
+	return 20180623
 endFunction
 
 event OnVersionUpdate(int a_version)
@@ -172,6 +216,13 @@ Event OnPageReset(string page)
 
 	ElseIf page == "$HP_MCM_Pages2"
 		
+		SetCursorFillMode(TOP_TO_BOTTOM)
+		
+		SetCursorPosition(0)
+			AddHeaderOption("$HP_MCM_FemaleCycleHeader")
+			
+		SetCursorPosition(1)
+			AddHeaderOption("$HP_MCM_FemaleCycleEffectsHeader")
 
 	ElseIf page == "$HP_MCM_Pages3"
 		
@@ -198,17 +249,34 @@ Event OnPageReset(string page)
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		
 		SetCursorPosition(0)
-			OIDCumInflationChance = AddSliderOption("$HP_MCM_CumInflationChance", CumInflationChance, "{0}%")
-			OIDCumInflationCreaturesOnly = AddToggleOption("$HP_MCM_CumInflationCreaturesOnly", CumInflationCreaturesOnly)
-		
+			;OIDCumInflationChance = AddSliderOption("$HP_MCM_CumInflationChance", CumInflationChance, "{0}%")
+			;OIDCumInflationCreaturesOnly = AddToggleOption("$HP_MCM_CumInflationCreaturesOnly", CumInflationCreaturesOnly)
+
+			AddHeaderOption("$HP_MCM_CumInflationHeader")
+			OIDCumInflation = AddToggleOption("$HP_MCM_CumInflation", CumInflation)
+			OIDCumSizeBase = AddSliderOption("$HP_MCM_CumSizeBase", CumSizeBase, "{0}")
+			OIDCumSizeRandomizer = AddSliderOption("$HP_MCM_CumSizeRandomizer", CumSizeRandomizer, "{0}%")
+			OIDCumSizeCreatureModifier = AddSliderOption("$HP_MCM_CumSizeCreatureModifier", CumSizeCreatureModifier, "{0}")
+			OIDCumSizeEstrusModifier = AddSliderOption("$HP_MCM_CumSizeEstrusModifier", CumSizeEstrusModifier, "{0}")
+			OIDCumAbsorb = AddSliderOption("$HP_MCM_CumAbsorb", CumAbsorb, "{0}")
+			OIDCumDrain = AddSliderOption("$HP_MCM_CumDrain", CumDrain, "{0}")
+
+		SetCursorPosition(1)
+			AddHeaderOption("$HP_MCM_CumInflationBellySettingHeader")
+			OIDCumBellySizeMax = AddSliderOption("$HP_MCM_CumBellySizeMax", CumBellySizeMax, "{1}")
+			OIDCumBellySizeMaxRandomizer = AddSliderOption("$HP_MCM_CumBellySizeMaxRandomizer", CumBellySizeMaxRandomizer, "{0}%")
+			OIDCumBellySizePerCum = AddSliderOption("$HP_MCM_CumBellySizePerCum", CumBellySizePerCum, "{1}")
+			
 	ElseIf page == "$HP_MCM_Pages5"
 		
 		SetCursorFillMode(TOP_TO_BOTTOM)
 		
 		SetCursorPosition(0)
+			AddHeaderOption("$HP_MCM_MilkingHeader")
 			OIDMilking = AddToggleOption("$HP_MCM_Milking", Milking)
 			OIDNPCMilking = AddToggleOption("$HP_MCM_NPCMilking", NPCMilking)
 			OIDMilkAll = AddToggleOption("$HP_MCM_MilkAll", MilkAll)
+			OIDMilkAllNPC = AddToggleOption("$HP_MCM_MilkAllNPC", MilkAllNPC)
 			OIDBodyTypeOptions = AddMenuOption("$HP_MCM_MilkingBodyTypeOptions", BodyTypeOptions[BodyTypeOption])
 		
 	ElseIf page == "$HP_MCM_Pages6"
@@ -247,18 +315,16 @@ Event OnPageReset(string page)
 						OIDClearSinglePregnancy[i] = AddTextOption("", "$HP_MCM_ClearPregnancy")
 ;						AddTextOption("Soulgems: " + hentaiPregnancyQuest.PregnantActors[i].getSoulGemCount(), "Size: " + hentaiPregnancyQuest.PregnantActors[i].getDurationHours() / SoulGemDuration / hentaiPregnancyQuest.PregnantActors[i].getSoulGemCount(), OPTION_FLAG_DISABLED)
 						
+						AddTextOption("$HP_MCM_CumInflatedstate", hentaiPregnancyQuest.PregnantActors[i].getCumInflation()/1000, OPTION_FLAG_DISABLED)
+						AddTextOption("$HP_MCM_Milk", hentaiPregnancyQuest.PregnantActors[i].getMilk(), OPTION_FLAG_DISABLED)
+						
 						form SoulGemType = hentaiPregnancyQuest.getSoulGemSize(hentaiPregnancyQuest.PregnantActors[i].getId())
 						if SoulGemType != none
 							AddTextOption(SoulGemType.GetName(), hentaiPregnancyQuest.PregnantActors[i].getSoulGemCount(), OPTION_FLAG_DISABLED)
 						else
 							AddTextOption("None", hentaiPregnancyQuest.PregnantActors[i].getSoulGemCount(), OPTION_FLAG_DISABLED)
 						endIf
-						
-						if hentaiPregnancyQuest.PregnantActors[i].getMilk() > 0
-							AddTextOption("$HP_MCM_Milk", hentaiPregnancyQuest.PregnantActors[i].getMilk(), OPTION_FLAG_DISABLED)
-						else
-							AddTextOption("", "", OPTION_FLAG_DISABLED)
-						endIf
+						AddTextOption("", "", OPTION_FLAG_DISABLED)
 					else
 						AddTextOption("you shouldnt see this", "", OPTION_FLAG_DISABLED)
 					endIf
@@ -289,6 +355,51 @@ Event OnOptionSliderAccept(int option, float floatValue)
 		
 		SetSliderOptionValue(option, floatValue, "{0}%")
 		CumInflationChance = value
+		
+	ElseIf option == OIDCumSizeBase
+		
+		SetSliderOptionValue(option, floatValue, "{0}")
+		CumSizeBase = value
+		
+	ElseIf option == OIDCumSizeRandomizer
+		
+		SetSliderOptionValue(option, floatValue, "{0}%")
+		CumSizeRandomizer = value
+		
+	ElseIf option == OIDCumSizeCreatureModifier
+		
+		SetSliderOptionValue(option, floatValue, "{0}")
+		CumSizeCreatureModifier = value
+		
+	ElseIf option == OIDCumSizeEstrusModifier
+		
+		SetSliderOptionValue(option, floatValue, "{0}")
+		CumSizeEstrusModifier = value
+		
+	ElseIf option == OIDCumAbsorb
+		
+		SetSliderOptionValue(option, floatValue, "{0}")
+		CumAbsorb = value
+		
+	ElseIf option == OIDCumDrain
+		
+		SetSliderOptionValue(option, floatValue, "{0}")
+		CumDrain = value
+		
+	ElseIf option == OIDCumBellySizeMax
+		
+		SetSliderOptionValue(option, floatValue, "{1}")
+		CumBellySizeMax = value
+		
+	ElseIf option == OIDCumBellySizeMaxRandomizer
+		
+		SetSliderOptionValue(option, floatValue, "{0}%")
+		CumBellySizeMaxRandomizer = value
+		
+	ElseIf option == OIDCumBellySizePerCum
+		
+		SetSliderOptionValue(option, floatValue, "{1}")
+		CumBellySizePerCum = value
 		
 	ElseIf option == OIDMaxScaleBelly
 		
@@ -353,6 +464,69 @@ Event OnOptionSliderOpen(int option)
 		SetSliderDialogDefaultValue(CumInflationChanceDefault)
 		SetSliderDialogRange(0, 100)
 		SetSliderDialogInterval(1)	
+		
+	ElseIf option == OIDCumSizeBase
+		
+		SetSliderDialogStartValue(CumSizeBase)
+		SetSliderDialogDefaultValue(CumSizeBaseDefault)
+		SetSliderDialogRange(10, 1000)
+		SetSliderDialogInterval(1)	
+		
+	ElseIf option == OIDCumSizeRandomizer
+		
+		SetSliderDialogStartValue(CumSizeRandomizer)
+		SetSliderDialogDefaultValue(CumSizeRandomizerDefault)
+		SetSliderDialogRange(0, 99)
+		SetSliderDialogInterval(1)	
+		
+	ElseIf option == OIDCumSizeCreatureModifier
+		
+		SetSliderDialogStartValue(CumSizeCreatureModifier)
+		SetSliderDialogDefaultValue(CumSizeCreatureModifierDefault)
+		SetSliderDialogRange(1, 100)
+		SetSliderDialogInterval(1)	
+		
+	ElseIf option == OIDCumSizeEstrusModifier
+		
+		SetSliderDialogStartValue(CumSizeEstrusModifier)
+		SetSliderDialogDefaultValue(CumSizeEstrusModifierDefault)
+		SetSliderDialogRange(1, 1000)
+		SetSliderDialogInterval(1)	
+		
+	ElseIf option == OIDCumAbsorb
+		
+		SetSliderDialogStartValue(CumAbsorb)
+		SetSliderDialogDefaultValue(CumAbsorbDefault)
+		SetSliderDialogRange(0, 1000)
+		SetSliderDialogInterval(1)	
+		
+	ElseIf option == OIDCumDrain
+		
+		SetSliderDialogStartValue(CumDrain)
+		SetSliderDialogDefaultValue(CumDrainDefault)
+		SetSliderDialogRange(10, 1000)
+		SetSliderDialogInterval(1)	
+		
+	ElseIf option == OIDCumBellySizeMax
+		
+		SetSliderDialogStartValue(CumBellySizeMax)
+		SetSliderDialogDefaultValue(CumBellySizeMaxDefault)
+		SetSliderDialogRange(1, 10)
+		SetSliderDialogInterval(0.1)	
+		
+	ElseIf option == OIDCumBellySizeMaxRandomizer
+		
+		SetSliderDialogStartValue(CumBellySizeMaxRandomizer)
+		SetSliderDialogDefaultValue(CumBellySizeMaxRandomizerDefault)
+		SetSliderDialogRange(0, 100)
+		SetSliderDialogInterval(10)	
+		
+	ElseIf option == OIDCumBellySizePerCum
+		
+		SetSliderDialogStartValue(CumBellySizePerCum)
+		SetSliderDialogDefaultValue(CumBellySizePerCumDefault)
+		SetSliderDialogRange(0.0, 10)
+		SetSliderDialogInterval(0.1)	
 		
 	ElseIf option == OIDMaxScaleBelly
 		
@@ -489,6 +663,11 @@ event OnOptionSelect(int option)
 		MilkAll = !MilkAll
 		SetToggleOptionValue(OIDMilkAll, MilkAll)
 		
+	elseIf option == OIDMilkAllNPC
+	
+		MilkAllNPC = !MilkAllNPC
+		SetToggleOptionValue(OIDMilkAllNPC, MilkAllNPC)
+		
 	elseIf option == OIDPostPregnancyEffects
 	
 		PostPregnancyEffects = !PostPregnancyEffects
@@ -508,6 +687,11 @@ event OnOptionSelect(int option)
 	
 		CumInflationCreaturesOnly = !CumInflationCreaturesOnly
 		SetToggleOptionValue(OIDCumInflationCreaturesOnly, CumInflationCreaturesOnly)
+		
+	elseIf option == OIDCumInflation
+	
+		CumInflation = !CumInflation
+		SetToggleOptionValue(OIDCumInflation, CumInflation)
 		
 	elseIf option == OIDEnableMessages
 	
@@ -555,6 +739,33 @@ Event OnOptionHighlight(int option)
 	ElseIf option == OIDCumInflationChance
 		SetInfoText("$HP_MCM_CumInflationChanceDescription")	
 		
+	ElseIf option == OIDCumSizeBase
+		SetInfoText("$HP_MCM_CumSizeBaseDescription")	
+		
+	ElseIf option == OIDCumSizeRandomizer
+		SetInfoText("$HP_MCM_CumSizeRandomizerDescription")	
+		
+	ElseIf option == OIDCumSizeCreatureModifier
+		SetInfoText("$HP_MCM_CumSizeCreatureModifierDescription")	
+		
+	ElseIf option == OIDCumSizeEstrusModifier
+		SetInfoText("$HP_MCM_CumSizeEstrusModifierDescription")	
+		
+	ElseIf option == OIDCumAbsorb
+		SetInfoText("$HP_MCM_CumAbsorbDescription")	
+		
+	ElseIf option == OIDCumDrain
+		SetInfoText("$HP_MCM_CumDrainDescription")	
+		
+	ElseIf option == OIDCumBellySizeMax
+		SetInfoText("$HP_MCM_CumBellySizeMaxDescription")	
+		
+	ElseIf option == OIDCumBellySizeMaxRandomizer
+		SetInfoText("$HP_MCM_CumBellySizeMaxRandomizerDescription")	
+		
+	ElseIf option == OIDCumBellySizePerCum
+		SetInfoText("$HP_MCM_CumBellySizePerCumDescription")	
+		
 	ElseIf option == OIDCumInflationCreaturesOnly
 		SetInfoText("$HP_MCM_CumInflationCreaturesOnlyDescription")	
 		
@@ -596,6 +807,9 @@ Event OnOptionHighlight(int option)
 		
 	ElseIf option == OIDMilkAll
 		SetInfoText("$HP_MCM_MilkAllDescription")
+		
+	ElseIf option == OIDMilkAllNPC
+		SetInfoText("$HP_MCM_MilkAllNPCDescription")
 		
 	ElseIf option == OIDPostPregnancyEffects
 		SetInfoText("$HP_MCM_PregnancyPostPregnancyEffectsDescription")
@@ -659,7 +873,7 @@ string[] function getPregnancyList()
 				TimeDesc = hentaiPregnancyQuest.Strings.ShowHentaiPregnancyConfigStrings(1)
 			elseif hentaiPregnancyQuest.PregnantActors[i].getState() == "PostPregnancy"
 				;postpregnancy hours left
-				Remainder = Remainder + hentaiPregnancyQuest.PregnantActors[i].getPostDurationHours()
+				Remainder = hentaiPregnancyQuest.PregnantActors[i].getPostDurationHours() - hentaiPregnancyQuest.PregnantActors[i].getCurrentHour()
 				TimeDesc += hentaiPregnancyQuest.Strings.ShowHentaiPregnancyConfigStrings(2)
 				if Remainder > 24
 					;postpregnancy days left
@@ -668,7 +882,11 @@ string[] function getPregnancyList()
 				endif
 			endif
 			;(soulgem)(post)pregnancy days, hours left
-			plist[i] = plist[i] + hentaiPregnancyQuest.PregnantActors[i].getMother().GetLeveledActorBase().GetName() + hentaiPregnancyQuest.Strings.ShowHentaiPregnancyConfigStrings(3) + hentaiPregnancyQuest.PregnantActors[i].getFather().GetLeveledActorBase().GetName() + " ~ " + Remainder + TimeDesc
+			if hentaiPregnancyQuest.getMotherState((hentaiPregnancyQuest.PregnantActors[i].GetActorRef())) != "CumInflated"
+				plist[i] = plist[i] + hentaiPregnancyQuest.PregnantActors[i].getMother().GetLeveledActorBase().GetName() + hentaiPregnancyQuest.Strings.ShowHentaiPregnancyConfigStrings(3) + hentaiPregnancyQuest.PregnantActors[i].getFather().GetLeveledActorBase().GetName() + " ~ " + Remainder + TimeDesc
+			else
+				plist[i] = plist[i] + hentaiPregnancyQuest.PregnantActors[i].getMother().GetLeveledActorBase().GetName()
+			endIf
 		endif
 		i += 1
 	endWhile
