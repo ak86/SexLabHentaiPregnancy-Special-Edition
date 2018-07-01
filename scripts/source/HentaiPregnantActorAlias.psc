@@ -146,7 +146,7 @@ int function setMilk(int i)
 	Milk = i
 	if Milk < 0
 		Milk = 0
-	elseif Milk > 100	;maxfactionrank is 127
+	elseif Milk > 100	;max factionrank is 127
 		Milk = 100
 	endif
 	
@@ -168,10 +168,13 @@ float function setCumInflation(float i)
 		CumInflation = i
 	else
 		CumInflation = HentaiP.config.CumBellySizeMax * (1 + Utility.RandomFloat(-1*HentaiP.config.CumBellySizeMaxRandomizer, HentaiP.config.CumBellySizeMaxRandomizer)/100) * 1000
-		if HentaiP.config.EnableMessages
+		if HentaiP.config.EnableMessages && (ActorRef == HentaiP.PlayerRef || HentaiP.PlayerRef.GetDistance(ActorRef) < 500)
 			Debug.Notification(ActorRef.GetDisplayName() + HentaiP.Strings.ShowHentaiPregnantActorAliasStrings(7))
 		EndIf
 	endIf
+	if CumInflation < 0
+		CumInflation = 0
+	endif
 	updateSizeBelly()
 	return CumInflation
 endFunction
@@ -184,10 +187,13 @@ int function setSoulGemCount(int i)
 	if i <= HentaiP.config.SoulGemsMax
 		SoulGemCount = i
 	else
-		if HentaiP.config.EnableMessages
+		if HentaiP.config.EnableMessages && (ActorRef == HentaiP.PlayerRef || HentaiP.PlayerRef.GetDistance(ActorRef) < 500)
 			Debug.Notification(ActorRef.GetDisplayName() + HentaiP.Strings.ShowHentaiPregnantActorAliasStrings(6))
 		EndIf
 	endIf
+	if SoulGemCount < 0
+		SoulGemCount = 0
+	endif
 	setSoulGemStartHour()
 	return SoulGemCount
 endFunction
@@ -662,3 +668,94 @@ State ClearPregnancy
 		; catch any pending updates
 	endEvent	
 EndState
+
+event OnSit(ObjectReference akFurniture)
+	;machine milking
+	
+	Bool MMEZAZ1 = Game.GetFormFromFile(0x26D2E, "MilkModNew Zaz.esp")
+	Bool MMEZAZ2 = Game.GetFormFromFile(0x26D2E , "MilkModNew Zaz Sandbox.esp")
+	Bool MME1 = akFurniture.HasKeyword( Game.GetFormFromFile(0x7e3bc, "MilkModNew.esp") as Keyword )
+	Bool MME2 = akFurniture.HasKeyword( Game.GetFormFromFile(0x7e3bd, "MilkModNew.esp") as Keyword )
+	Bool ZAZ1 = akFurniture.HasKeyword( Game.GetFormFromFile(0x26D1B, "ZaZAnimationPack.esm") as Keyword )
+	Bool ZAZ2 = akFurniture.HasKeyword( Game.GetFormFromFile(0x26D17, "ZaZAnimationPack.esm") as Keyword )
+
+	Int Animationtoplay = 0
+	
+	;Debug.Notification(" OnSit ")
+	if MME1	|| ZAZ1
+		;Non bound milking
+		if !MMEZAZ1 && !MMEZAZ2 && ZAZ1
+			;run animation if there are no mme patches for zaz and its zaz dwemer machines
+			Animationtoplay = 1
+		endif
+	elseif MME2	|| ZAZ2
+		;Bound milking
+		if !MMEZAZ1 && !MMEZAZ2 && ZAZ2
+			;run animation if there are no mme patches for zaz and its zaz dwemer machines
+			Animationtoplay = 2
+		endif
+	else
+		; wrong furniture, exit
+		;Debug.Notification(" wrong furniture ")
+		return
+	endif
+	
+	;strip
+	form stripped
+	if HentaiP.config.MilkpumpsStrip
+		stripped = HentaiP.getBodyItem(ActorRef)
+		HentaiP.UnequipItem(ActorRef, stripped, true, false)
+		;Debug.Notification("stripped " +  stripped.getname())
+	endif
+	
+	;wait for sit
+	utility.wait(5.0)
+;	while ActorRef.GetSitState() != 3
+;		utility.wait(1.0)
+;		;Debug.Notification(" wait for sit ")
+;		if ActorRef.GetSitState() == 0
+;			return
+;		endif
+;	endwhile
+	
+	;play animation
+	if HentaiP.config.MilkpumpsPlayAnimation
+		;Debug.Notification(" play anim " + Animationtoplay)
+		if Animationtoplay == 1
+			Debug.SendAnimationEvent(ActorRef,"ZaZMOMFreeFurn_11")
+			;Debug.Notification(" ZaZMOMFreeFurn_11 ")
+		elseif Animationtoplay == 2
+			Debug.SendAnimationEvent(ActorRef,"ZaZMOMBoundFurn_11")
+			;Debug.Notification(" ZaZMOMBoundFurn_11 ")
+		endif
+	endif
+	
+	;milk/inflate
+	while ActorRef.GetSitState() > 0
+		utility.wait(5.0)
+		;reduce milk
+		if getMilk() > 0
+			setMilk(getMilk() - 1)
+			if Game.GetModbyName("HearthFires.esm") != 255
+				ActorRef.AddItem(Game.GetFormFromFile(0x3534, "HearthFires.esm"), 1)
+			endif
+			if HentaiP.PlayerRef.GetDistance(ActorRef) < 500 && HentaiP.config.EnableMessages
+				Debug.Notification(ActorRef.GetDisplayName() + " - " + getMilk() + HentaiP.Strings.ShowHentaiPregnantActorAliasStrings(8))
+			endif
+		endif
+		
+		;reduce/increase cuminflation
+		if HentaiP.config.MilkpumpsCuminflationMode == 1
+			setCumInflation(getCumInflation() + HentaiP.config.CumDrain*5)
+		elseif HentaiP.config.MilkpumpsCuminflationMode == 2
+			setCumInflation(getCumInflation() - HentaiP.config.CumDrain*5)
+		endif
+	endwhile
+	
+	;redress
+	if stripped
+		HentaiP.EquipItem(ActorRef, stripped, false, false)
+	endif
+	
+	;Debug.Notification("stop milking")
+endevent

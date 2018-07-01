@@ -10,7 +10,7 @@ Function ResetStrings()
 	HentaiImpregnatedStrings = new string[1]
 	HentaiImpregnatedStrings[0] = " is no longer inflated."
 
-	HentaiPregnantActorAliasStrings = new string[8]
+	HentaiPregnantActorAliasStrings = new string[9]
 	HentaiPregnantActorAliasStrings[0] = "It seems due to pregnancy you breasts started lactating."
 	HentaiPregnantActorAliasStrings[1] = "Your breasts are full of milk."
 	HentaiPregnantActorAliasStrings[2] = " is no longer pregnant."
@@ -19,6 +19,7 @@ Function ResetStrings()
 	HentaiPregnantActorAliasStrings[5] = "'s pregnancy terminated."
 	HentaiPregnantActorAliasStrings[6] = " is full of soul gems, gem seed was absorbed."
 	HentaiPregnantActorAliasStrings[7] = " is so full of cum, her belly can't hold anymore."
+	HentaiPregnantActorAliasStrings[8] = " milk left."
 	
 	HentaiMilkSquirtEffectStrings = new string[4]
 	HentaiMilkSquirtEffectStrings[0] = "You squirt your delicious breast milk into a jug."
@@ -46,8 +47,8 @@ Function ResetStrings()
 		
 EndFunction
 
-int Function Getversion()
-	return 2
+int Function GetVersion()
+	return 3
 EndFunction
 
 String Function ShowHentaiImpregnatedStrings(Int StringID)

@@ -106,7 +106,7 @@ function gameLoaded()
 	RegisterForModEvent("OrgasmStart", "HentaiPregnancyImpregnate")
 	RegisterForModEvent("AnimationStart", "OnSexLabStart")
 	RegisterForModEvent("SexLabOrgasmSeparate", "HentaiPregnancyImpregnateS")
-	if Strings.getversion() != 2
+	if Strings.getversion() != 3
 		Debug.Notification("HentaiPregnancy translation script outdated")
 	endif
 	Strings.ResetStrings()
