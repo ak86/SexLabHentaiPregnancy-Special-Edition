@@ -138,22 +138,13 @@ int function getMilk()
 	if ActorRef.GetFactionRank(HentaiP.HentaiLactatingFaction) < 0
 		setMilk(0)
 	endif
-	Milk = ActorRef.GetFactionRank(HentaiP.HentaiLactatingFaction)
+	;can have more milk than mod allows(if set manually/by other mod), will be reset on next milk update cycle
+	Milk = PapyrusUtil.ClampInt(ActorRef.GetFactionRank(HentaiP.HentaiLactatingFaction), 0, 100)
 	return Milk
 endFunction
 
 int function setMilk(int i)
-	Milk = i
-	if Milk < 0
-		Milk = 0
-	elseif Milk > 100	;max factionrank is 127
-		Milk = 100
-	endif
-	
-	if Milk > CurrentBreastSize
-		Milk = Math.Floor(CurrentBreastSize)
-	endif
-	
+	Milk = PapyrusUtil.ClampInt(i, 0, Math.Floor(CurrentBreastSize))
 	ActorRef.SetFactionRank(HentaiP.HentaiLactatingFaction, Milk)
 	updateSizeBreast()
 	return Milk
@@ -184,12 +175,13 @@ int function getSoulGemCount()
 endFunction
 
 int function setSoulGemCount(int i)
-	if i <= HentaiP.config.SoulGemsMax
+	if i <= HentaiP.config.MaxScaleBelly/HentaiP.config.SoulGemBellySize
 		SoulGemCount = i
 	else
 		if HentaiP.config.EnableMessages && (ActorRef == HentaiP.PlayerRef || HentaiP.PlayerRef.GetDistance(ActorRef) < 500)
 			Debug.Notification(ActorRef.GetDisplayName() + HentaiP.Strings.ShowHentaiPregnantActorAliasStrings(6))
 		EndIf
+		SoulGemCount = Math.Floor(HentaiP.config.MaxScaleBelly/HentaiP.config.SoulGemBellySize)
 	endIf
 	if SoulGemCount < 0
 		SoulGemCount = 0
@@ -232,7 +224,8 @@ function updateSizeBreast()
 		endIf
 		HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC L Breast", FinalBreastSize)
 		HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC R Breast", FinalBreastSize)
-		;Debug.Notification("SetNodeScale NPC L Breast " + FinalBreastSize)
+		HentaiP.BodyMod.SetMorphScale(ActorRef, "NipplePerkiness", Milk)
+		HentaiP.BodyMod.SetMorphScale(ActorRef, "NippleLength", Milk)
 	endIf
 endFunction
 
@@ -409,7 +402,6 @@ State CumInflated
 			if fertilised
 				GoToState("Pregnant")
 			else
-				HentaiP.endPregnancy(ActorRef, pregnancyID, isvictim, 0)
 				HentaiP.ResetBody(ActorRef)
 				GoToState("ReadyForPregnancy")
 			endIf
@@ -469,7 +461,7 @@ State Pregnant
 					ActorRef.Addspell(HentaiP.HentaiSoulgemBirthSpell)
 				EndIf
 				
-				If CurrentHour >= DurationHours/3 && HentaiP.config.Milking
+				If CurrentHour >= DurationHours/3 && HentaiP.config.PCMilking
 					;hand milking
 					if !ActorRef.HasSpell(HentaiP.HentaiMilkSquirtSpellList.GetAt(0) as Spell)
 						if HentaiP.config.EnableMessages
@@ -484,17 +476,19 @@ State Pregnant
 				EndIf
 			EndIf
 			
-			If CurrentHour > DurationHours/3 && HentaiP.config.Milking
-				setMilk(getMilk() + 1)
-				If ActorRef == HentaiP.PlayerRef
-					if HentaiP.config.EnableMessages
-						Debug.Notification(HentaiP.Strings.ShowHentaiPregnantActorAliasStrings(1))
+			if (ActorRef == HentaiP.PlayerRef && HentaiP.config.PCMilking) || (ActorRef != HentaiP.PlayerRef && HentaiP.config.NPCMilking)
+				If CurrentHour > DurationHours/3
+					setMilk(getMilk() + 1)
+					If ActorRef == HentaiP.PlayerRef
+						if HentaiP.config.EnableMessages
+							Debug.Notification(HentaiP.Strings.ShowHentaiPregnantActorAliasStrings(1))
+						EndIf
+					Elseif HentaiP.config.NPCMilking
+						HentaiP.NpcMilking(ActorRef)
 					EndIf
-				Elseif HentaiP.config.NPCMilking
-					HentaiP.NpcMilking(ActorRef)
+				Else
+					ActorRef.RemoveFromFaction(HentaiP.HentaiLactatingFaction)
 				EndIf
-			Else
-				ActorRef.RemoveFromFaction(HentaiP.HentaiLactatingFaction)
 			EndIf
 			
 		Else
@@ -600,17 +594,19 @@ State PostPregnancy
 			EndWhile
 			lastGameTime = currentTime
 			
-			If CurrentHour+PostDurationHours/3 < PostDurationHours && HentaiP.config.Milking
-				setMilk(getMilk() + 1)
-				If ActorRef == HentaiP.PlayerRef
-					if HentaiP.config.EnableMessages
-						Debug.Notification(HentaiP.Strings.ShowHentaiPregnantActorAliasStrings(1))
+			if (ActorRef == HentaiP.PlayerRef && HentaiP.config.PCMilking) || (ActorRef != HentaiP.PlayerRef && HentaiP.config.NPCMilking)
+				If CurrentHour+PostDurationHours/3 < PostDurationHours
+					setMilk(getMilk() + 1)
+					If ActorRef == HentaiP.PlayerRef
+						if HentaiP.config.EnableMessages
+							Debug.Notification(HentaiP.Strings.ShowHentaiPregnantActorAliasStrings(1))
+						EndIf
+					Elseif HentaiP.config.NPCMilking
+						HentaiP.NpcMilking(ActorRef)
 					EndIf
-				Elseif HentaiP.config.NPCMilking
-					HentaiP.NpcMilking(ActorRef)
+				Else
+					ActorRef.RemoveFromFaction(HentaiP.HentaiLactatingFaction)
 				EndIf
-			Else
-				ActorRef.RemoveFromFaction(HentaiP.HentaiLactatingFaction)
 			EndIf
 			;old milking, disabled
 			;HentaiP.addTempPostPregnancyEffects(ActorRef, PostDurationHours - CurrentHour)

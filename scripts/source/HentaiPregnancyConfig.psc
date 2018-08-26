@@ -20,25 +20,52 @@ int OIDMilkpumpsCuminflationMode
 int Property MilkpumpsCuminflationMode = 0 Auto Hidden
 string[] MilkpumpsCuminflationOptions
 
-
+;nie/nio node scaling
 Float Property MaxScaleBelly = 5.0 Auto Hidden
 Float MaxScaleBellyDefault = 5.0
 int OIDMaxScaleBelly
 
-Float Property MaxScaleBreasts = 2.0 Auto Hidden
-Float MaxScaleBreastsDefault = 2.0
+Float Property MaxScaleBreasts = 3.0 Auto Hidden
+Float MaxScaleBreastsDefault = 3.0
 int OIDMaxScaleBreasts
 
 int OIDBreastScaling
 bool Property BreastScaling = true Auto Hidden
 
-int OIDResetScaling
-bool Property ResetScaling = false Auto Hidden
-
 int OIDBellyScaling
 bool Property BellyScaling = true Auto Hidden
 
+;morph scaling
+Float Property BreastsSH = 0.5 Auto Hidden
+Float BreastsSHDefault = 0.5
+int OIDBreastsSH
 
+Float Property BreastsSSH = 0.5 Auto Hidden
+Float BreastsSSHDefault = 0.5
+int OIDBreastsSSH
+
+Float Property BreastGravity = 0.5 Auto Hidden
+Float BreastGravityDefault = 0.5
+int OIDBreastGravity
+
+Float Property NippleAreola = 1.0 Auto Hidden
+Float NippleAreolaDefault = 1.0
+int OIDNippleAreola
+
+Float Property NipplePerkiness = 0.5 Auto Hidden
+Float NipplePerkinessDefault = 0.5
+int OIDNipplePerkiness
+
+Float Property NippleLength = 0.5 Auto Hidden
+Float NippleLengthDefault = 0.5
+int OIDNippleLength
+
+Float Property PregnancyBelly = 0.5 Auto Hidden
+Float PregnancyBellyDefault = 0.5
+int OIDPregnancyBelly
+
+int OIDResetScaling
+bool Property ResetScaling = false Auto Hidden
 
 ; ----- Pregnancy settings -----
 
@@ -82,14 +109,14 @@ int[] OIDClearSinglePregnancy
 
 ; ----- Milking settings -----
 
-int OIDMilking
-bool Property Milking = true Auto Hidden
+int OIDPCMilking
+bool Property PCMilking = true Auto Hidden
 
 int OIDNPCMilking
 bool Property NPCMilking = true Auto Hidden
 
-int OIDMilkAll
-bool Property MilkAll = false Auto Hidden
+int OIDMilkAllPC
+bool Property MilkAllPC = false Auto Hidden
 
 int OIDMilkAllNPC
 bool Property MilkAllNPC = false Auto Hidden
@@ -155,10 +182,6 @@ int OIDCumBellySizePerCum
 int Property SoulGemDuration = 20 Auto Hidden
 int SoulGemDurationDefault = 20
 int OIDSoulGemDuration
-
-int Property SoulGemsMax = 5 Auto Hidden
-int SoulGemsMaxDefault = 5
-int OIDSoulGemsMax
 
 Float Property SoulGemBellySize = 1.0 Auto Hidden
 Float SoulGemBellySizeDefault = 1.0
@@ -251,10 +274,21 @@ Event OnPageReset(string page)
 
 				OIDBreastScaling = AddToggleOption("$HP_MCM_BreastScaling", BreastScaling)
 				OIDMaxScaleBreasts = AddSliderOption("$HP_MCM_MaxScaleBreasts", MaxScaleBreasts, "{1}")
+				AddEmptyOption()
+
+			AddHeaderOption("$HP_MCM_BodyMorphingHeader")
+
+				OIDBreastsSH = AddSliderOption("$HP_MCM_BreastsSH", BreastsSH, "{2}")
+				OIDBreastsSSH = AddSliderOption("$HP_MCM_BreastsSSH", BreastsSSH, "{2}")
+				OIDBreastGravity = AddSliderOption("$HP_MCM_BreastGravity", BreastGravity, "{2}")
+				OIDNippleAreola = AddSliderOption("$HP_MCM_NippleAreola", NippleAreola, "{2}")
+				OIDNipplePerkiness = AddSliderOption("$HP_MCM_NipplePerkiness", NipplePerkiness, "{2}")
+				OIDNippleLength = AddSliderOption("$HP_MCM_NippleLength", NippleLength, "{2}")
+				OIDPregnancyBelly = AddSliderOption("$HP_MCM_PregnancyBelly", PregnancyBelly, "{2}")
 
 				AddEmptyOption()
 				OIDResetScaling = AddToggleOption("$HP_MCM_ResetScaling", ResetScaling)
-
+				
 	ElseIf page == "$HP_MCM_Pages2"
 		
 		SetCursorFillMode(TOP_TO_BOTTOM)
@@ -294,9 +328,9 @@ Event OnPageReset(string page)
 		
 		SetCursorPosition(0)
 			AddHeaderOption("$HP_MCM_MilkingHeader")
-			OIDMilking = AddToggleOption("$HP_MCM_Milking", Milking)
+			OIDPCMilking = AddToggleOption("$HP_MCM_PCMilking", PCMilking)
 			OIDNPCMilking = AddToggleOption("$HP_MCM_NPCMilking", NPCMilking)
-			OIDMilkAll = AddToggleOption("$HP_MCM_MilkAll", MilkAll)
+			OIDMilkAllPC = AddToggleOption("$HP_MCM_MilkAllPC", MilkAllPC)
 			OIDMilkAllNPC = AddToggleOption("$HP_MCM_MilkAllNPC", MilkAllNPC)
 			OIDBodyTypeOptions = AddMenuOption("$HP_MCM_MilkingBodyTypeOptions", BodyTypeOptions[BodyTypeOption])
 		
@@ -331,7 +365,6 @@ Event OnPageReset(string page)
 			OIDCreaturesOnly = AddToggleOption("$HP_MCM_SoulGemCreaturesOnly", CreaturesOnly)
 			;OIDForcedOnly = AddToggleOption("$HP_MCM_SoulGemForcedOnly", ForcedOnly)
 			OIDSoulGemDuration = AddSliderOption("$HP_MCM_SoulGemDuration", SoulGemDuration, "$HP_Hours")
-			OIDSoulGemsMax = AddSliderOption("$HP_MCM_SoulGemsMax", SoulGemsMax, "{0}")
 			OIDSoulGemBellySize = AddSliderOption("$HP_MCM_SoulGemBellySize", SoulGemBellySize, "{1}")
 		
 	ElseIf page == "$HP_MCM_Pages7"
@@ -456,6 +489,55 @@ Event OnOptionSliderAccept(int option, float floatValue)
 		hentaiPregnancyQuest.UpdateTargetSize()
 		hentaiPregnancyQuest.UpdateSize()
 		
+	ElseIf option == OIDBreastsSH
+		
+		SetSliderOptionValue(option, floatValue, "{2}")
+		BreastsSH = floatValue
+		hentaiPregnancyQuest.UpdateTargetSize()
+		hentaiPregnancyQuest.UpdateSize()
+		
+	ElseIf option == OIDBreastsSSH
+		
+		SetSliderOptionValue(option, floatValue, "{2}")
+		BreastsSSH = floatValue
+		hentaiPregnancyQuest.UpdateTargetSize()
+		hentaiPregnancyQuest.UpdateSize()
+		
+	ElseIf option == OIDBreastGravity
+		
+		SetSliderOptionValue(option, floatValue, "{2}")
+		BreastGravity = floatValue
+		hentaiPregnancyQuest.UpdateTargetSize()
+		hentaiPregnancyQuest.UpdateSize()
+		
+	ElseIf option == OIDNippleAreola
+		
+		SetSliderOptionValue(option, floatValue, "{2}")
+		NippleAreola = floatValue
+		hentaiPregnancyQuest.UpdateTargetSize()
+		hentaiPregnancyQuest.UpdateSize()
+		
+	ElseIf option == OIDNipplePerkiness
+		
+		SetSliderOptionValue(option, floatValue, "{2}")
+		NipplePerkiness = floatValue
+		hentaiPregnancyQuest.UpdateTargetSize()
+		hentaiPregnancyQuest.UpdateSize()
+		
+	ElseIf option == OIDNippleLength
+		
+		SetSliderOptionValue(option, floatValue, "{2}")
+		NippleLength = floatValue
+		hentaiPregnancyQuest.UpdateTargetSize()
+		hentaiPregnancyQuest.UpdateSize()
+		
+	ElseIf option == OIDPregnancyBelly
+		
+		SetSliderOptionValue(option, floatValue, "{2}")
+		PregnancyBelly = floatValue
+		hentaiPregnancyQuest.UpdateTargetSize()
+		hentaiPregnancyQuest.UpdateSize()
+		
 	ElseIf option == OIDPregnancyDuration
 		
 		SetSliderOptionValue(option, floatValue, "$HP_Days")
@@ -466,11 +548,6 @@ Event OnOptionSliderAccept(int option, float floatValue)
 		
 		SetSliderOptionValue(option, floatValue, "$HP_Hours")
 		SoulGemDuration = floatValue as int
-		
-	ElseIf option == OIDSoulGemsMax
-		
-		SetSliderOptionValue(option, floatValue, "{0}")
-		SoulGemsMax = floatValue as int
 		
 	ElseIf option == OIDSoulGemBellySize
 		
@@ -573,16 +650,65 @@ Event OnOptionSliderOpen(int option)
 		
 		SetSliderDialogStartValue(MaxScaleBelly)
 		SetSliderDialogDefaultValue(MaxScaleBellyDefault)
-		SetSliderDialogRange(0.5, 20)
+		SetSliderDialogRange(2, 20)
 		SetSliderDialogInterval(0.5)
 		
 	ElseIf option == OIDMaxScaleBreasts
 		
 		SetSliderDialogStartValue(MaxScaleBreasts)
 		SetSliderDialogDefaultValue(MaxScaleBreastsDefault)
-		SetSliderDialogRange(1, 10)
+		SetSliderDialogRange(2, 10)
 		SetSliderDialogInterval(0.1)
-
+				
+	ElseIf option == OIDBreastsSH
+		
+		SetSliderDialogStartValue(BreastsSH)
+		SetSliderDialogDefaultValue(BreastsSHDefault)
+		SetSliderDialogRange(0, 1)
+		SetSliderDialogInterval(0.1)
+		
+	ElseIf option == OIDBreastsSSH
+		
+		SetSliderDialogStartValue(BreastsSSH)
+		SetSliderDialogDefaultValue(BreastsSSHDefault)
+		SetSliderDialogRange(0, 1)
+		SetSliderDialogInterval(0.1)
+		
+	ElseIf option == OIDBreastGravity
+		
+		SetSliderDialogStartValue(BreastGravity)
+		SetSliderDialogDefaultValue(BreastGravityDefault)
+		SetSliderDialogRange(0, 1)
+		SetSliderDialogInterval(0.1)
+		
+	ElseIf option == OIDNippleAreola
+		
+		SetSliderDialogStartValue(NippleAreola)
+		SetSliderDialogDefaultValue(NippleAreolaDefault)
+		SetSliderDialogRange(0, 1)
+		SetSliderDialogInterval(0.1)
+		
+	ElseIf option == OIDNipplePerkiness
+		
+		SetSliderDialogStartValue(NipplePerkiness)
+		SetSliderDialogDefaultValue(NipplePerkinessDefault)
+		SetSliderDialogRange(0, 1)
+		SetSliderDialogInterval(0.1)
+		
+	ElseIf option == OIDNippleLength
+		
+		SetSliderDialogStartValue(NippleLength)
+		SetSliderDialogDefaultValue(NippleLengthDefault)
+		SetSliderDialogRange(-10, 1)
+		SetSliderDialogInterval(0.1)
+		
+	ElseIf option == OIDPregnancyBelly
+		
+		SetSliderDialogStartValue(PregnancyBelly)
+		SetSliderDialogDefaultValue(PregnancyBellyDefault)
+		SetSliderDialogRange(0, 1)
+		SetSliderDialogInterval(0.1)
+		
 	ElseIf option == OIDPregnancyDuration
 		
 		SetSliderDialogStartValue(PregnancyDuration)
@@ -597,18 +723,11 @@ Event OnOptionSliderOpen(int option)
 		SetSliderDialogRange(1, 100)
 		SetSliderDialogInterval(1)
 		
-	ElseIf option == OIDSoulGemsMax
-		
-		SetSliderDialogStartValue(SoulGemsMax)
-		SetSliderDialogDefaultValue(SoulGemsMaxDefault)
-		SetSliderDialogRange(1, 100)
-		SetSliderDialogInterval(1)
-		
 	ElseIf option == OIDSoulGemBellySize
 		
 		SetSliderDialogStartValue(SoulGemBellySize)
 		SetSliderDialogDefaultValue(SoulGemBellySizeDefault)
-		SetSliderDialogRange(0, 10)
+		SetSliderDialogRange(0.5, 10)
 		SetSliderDialogInterval(0.1)
 		
 	EndIf
@@ -700,20 +819,20 @@ event OnOptionSelect(int option)
 		ResetScaling = !ResetScaling
 		SetToggleOptionValue(OIDResetScaling, ResetScaling)
 		
-	elseIf option == OIDMilking
+	elseIf option == OIDPCMilking
 	
-		Milking = !Milking
-		SetToggleOptionValue(OIDMilking, Milking)
+		PCMilking = !PCMilking
+		SetToggleOptionValue(OIDPCMilking, PCMilking)
 		
 	elseIf option == OIDNPCMilking
 	
 		NPCMilking = !NPCMilking
 		SetToggleOptionValue(OIDNPCMilking, NPCMilking)
 		
-	elseIf option == OIDMilkAll
+	elseIf option == OIDMilkAllPC
 	
-		MilkAll = !MilkAll
-		SetToggleOptionValue(OIDMilkAll, MilkAll)
+		MilkAllPC = !MilkAllPC
+		SetToggleOptionValue(OIDMilkAllPC, MilkAllPC)
 		
 	elseIf option == OIDMilkAllNPC
 	
@@ -873,14 +992,14 @@ Event OnOptionHighlight(int option)
 	ElseIf option == OIDBellyScaling
 		SetInfoText("$HP_MCM_BellyScalingDescription")	
 		
-	ElseIf option == OIDMilking
-		SetInfoText("$HP_MCM_MilkingDescription")
+	ElseIf option == OIDPCMilking
+		SetInfoText("$HP_MCM_PCMilkingDescription")
 		
 	ElseIf option == OIDNPCMilking
 		SetInfoText("$HP_MCM_NPCMilkingDescription")
 		
-	ElseIf option == OIDMilkAll
-		SetInfoText("$HP_MCM_MilkAllDescription")
+	ElseIf option == OIDMilkAllPC
+		SetInfoText("$HP_MCM_MilkAllPCDescription")
 		
 	ElseIf option == OIDMilkAllNPC
 		SetInfoText("$HP_MCM_MilkAllNPCDescription")
@@ -896,9 +1015,6 @@ Event OnOptionHighlight(int option)
 		
 	ElseIf option == OIDSoulGemDuration
 		SetInfoText("$HP_MCM_SoulGemDurationDescription")
-		
-	ElseIf option == OIDSoulGemsMax
-		SetInfoText("$HP_MCM_SoulGemsMaxDescription")
 		
 	ElseIf option == OIDSoulGemBellySize
 		SetInfoText("$HP_MCM_SoulGemBellySizeDescription")

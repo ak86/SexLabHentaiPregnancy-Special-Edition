@@ -1,4 +1,5 @@
-Scriptname HentaiMilkSquirtEffect extends ActiveMagicEffect  
+Scriptname HentaiMilkSquirtEffect extends ActiveMagicEffect
+;PC self milking spell, npcs uses HentaiP.NpcMilking()
 
 Event OnEffectStart(Actor Target, Actor Caster)
 	HentaiPregnancy HentaiP = Quest.GetQuest("HentaiPregnancyQuest") as HentaiPregnancy
@@ -28,7 +29,7 @@ Event OnEffectStart(Actor Target, Actor Caster)
 			endif
 			
 			int howmuchtomilk = 1
-			if HentaiP.config.MilkAll
+			if HentaiP.config.MilkAllPC
 				howmuchtomilk = Caster.GetFactionRank(HentaiP.HentaiLactatingFaction)
 			endif
 			

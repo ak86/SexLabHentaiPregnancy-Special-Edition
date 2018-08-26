@@ -425,9 +425,18 @@ function clearSinglePregnancy(int index)
 endFunction
 
 function ResetBody(Actor ActorRef)
+	;node scale
 	BodyMod.SetNodeScale(ActorRef, "NPC Belly", 1)
 	BodyMod.SetNodeScale(ActorRef, "NPC L Breast", 1)
 	BodyMod.SetNodeScale(ActorRef, "NPC R Breast", 1)
+	;morphs scale
+	BodyMod.ClearMorphScale(ActorRef, "BreastsSH")
+	BodyMod.ClearMorphScale(ActorRef, "BreastsSSH")
+	BodyMod.ClearMorphScale(ActorRef, "BreastGravity")
+	BodyMod.ClearMorphScale(ActorRef, "NippleAreola")
+	BodyMod.ClearMorphScale(ActorRef, "NipplePerkiness")
+	BodyMod.ClearMorphScale(ActorRef, "NippleLength")
+	BodyMod.ClearMorphScale(ActorRef, "PregnancyBelly")
 
 	; reset SexLab Inflation Framework  
 	int SLIF_unregisterActor = ModEvent.Create("SLIF_unregisterActor")
@@ -506,12 +515,8 @@ bool function setPregnant(Actor father, Actor mother, bool isvictim, bool fertil
 			CumInflation(canMotherInflate(mother), father)
 		endIf
 		utility.wait(1.0)
-		
-;	elseIf mother.AddSpell(HentaiImpregnation, false)
-;		if config.EnableMessages
-;			Debug.Notification(father.GetLeveledActorBase().GetName() + Strings.ShowHentaiPregnancyStrings(2) + mother.GetLeveledActorBase().GetName())
-;		endif
 	endIf
+	
 	return ispregnant
 endFunction
 
@@ -686,7 +691,7 @@ function NpcMilking(Actor Caster)
 			endif
 			
 			int howmuchtomilk = 1
-			if config.MilkAll || config.MilkAllNPC
+			if config.MilkAllNPC
 				howmuchtomilk = Caster.GetFactionRank(HentaiLactatingFaction)
 			endif
 			

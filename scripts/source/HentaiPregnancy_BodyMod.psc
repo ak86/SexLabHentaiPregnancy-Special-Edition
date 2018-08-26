@@ -49,3 +49,9 @@ Function SetNodeScale(Actor akActor, string nodeName, float value)
 		NiOverride.UpdateNodeTransform(akActor, false, isFemale, nodeName)
 	Endif
 EndFunction
+
+Function SetMorphScale(Actor akActor, string nodeName, float value)
+EndFunction
+
+Function ClearMorphScale(Actor akActor, string nodeName)
+EndFunction

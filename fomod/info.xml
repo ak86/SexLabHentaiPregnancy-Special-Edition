@@ -1,34 +1,6 @@
 <fomod>
   <Name>SexLabHentaiPregnancy Special Edition</Name>
-  <Version>01-07-2018</Version>
+  <Version>26-08-2018</Version>
   <Author>Ed86</Author>
   <Website>https://www.patreon.com/Ed86</Website>
-  <Description>
-  changes since SexLabHentaiPregnancy V1.19:
-  fixed missing properties
-  fixed scripts to support Sexlab Framework v1.59c+
-  increased active pregnancies 20->50
-  increased max possible pregnancy duration to 270 +-10% days
-  Support for SexLab Inflation Framework
-  Support for SL Separate Orgasms
-  Support for EC/ES/ED - their pregnancies block pregnancy, cuminflation will still happen
-  changed default scaling to NetImmerse Override(makes mod compatible will all other bodychanging mods)
-  added breast and belly scale toggles
-  added milking
-  added breastfeeding
-  added soulgem birthing
-  added toggle to allow non unique npcs pregnancy
-  added script checks so birthing/milking wont be interrupted by sexlab (and maybe other mods)
-  added HentaiPregnantFaction to detect pregnancy type/state, without dependency for HP
-  added HentaiLactatingFaction to detect lactation, rank=milk
-  full mcm translation support
-  full script translation support
-  something else
-    
-  
-  TODOornotTODO:
-  female cycle
-  more pregnancy effects
-  
-  </Description>
 </fomod>
