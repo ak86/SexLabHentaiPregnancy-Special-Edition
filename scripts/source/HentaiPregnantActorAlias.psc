@@ -224,6 +224,7 @@ function updateSizeBreast()
 		endIf
 		HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC L Breast", FinalBreastSize)
 		HentaiP.BodyMod.SetNodeScale(ActorRef, "NPC R Breast", FinalBreastSize)
+		HentaiP.BodyMod.SetMorphScale(ActorRef, "DoubleMelon", Milk)
 		HentaiP.BodyMod.SetMorphScale(ActorRef, "NipplePerkiness", Milk)
 		HentaiP.BodyMod.SetMorphScale(ActorRef, "NippleLength", Milk)
 	endIf

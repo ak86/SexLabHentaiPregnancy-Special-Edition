@@ -36,6 +36,7 @@ int OIDBellyScaling
 bool Property BellyScaling = true Auto Hidden
 
 ;morph scaling
+;pregnancy breast
 Float Property BreastsSH = 0.5 Auto Hidden
 Float BreastsSHDefault = 0.5
 int OIDBreastsSH
@@ -52,17 +53,43 @@ Float Property NippleAreola = 1.0 Auto Hidden
 Float NippleAreolaDefault = 1.0
 int OIDNippleAreola
 
-Float Property NipplePerkiness = 0.5 Auto Hidden
-Float NipplePerkinessDefault = 0.5
-int OIDNipplePerkiness
+;pregnancy belly
+Float Property ChubbyArms = 0.5 Auto Hidden
+Float ChubbyArmsDefault = 0.5
+int OIDChubbyArms
 
-Float Property NippleLength = 0.5 Auto Hidden
-Float NippleLengthDefault = 0.5
-int OIDNippleLength
+Float Property ChubbyWaist = 0.5 Auto Hidden
+Float ChubbyWaistDefault = 0.5
+int OIDChubbyWaist
+
+Float Property ChubbyButt = 0.5 Auto Hidden
+Float ChubbyButtDefault = 0.5
+int OIDChubbyButt
+
+Float Property ChubbyLegs = 0.5 Auto Hidden
+Float ChubbyLegsDefault = 0.5
+int OIDChubbyLegs
+
+Float Property ButtShape2 = 0.5 Auto Hidden
+Float ButtShape2Default = 0.5
+int OIDButtShape2
 
 Float Property PregnancyBelly = 0.5 Auto Hidden
 Float PregnancyBellyDefault = 0.5
 int OIDPregnancyBelly
+
+;pregnancy milk
+Float Property DoubleMelon = 1.0 Auto Hidden
+Float DoubleMelonDefault = 1.0
+int OIDDoubleMelon
+
+Float Property NipplePerkiness = 1.0 Auto Hidden
+Float NipplePerkinessDefault = 1.0
+int OIDNipplePerkiness
+
+Float Property NippleLength = 1.0 Auto Hidden
+Float NippleLengthDefault = 1.0
+int OIDNippleLength
 
 int OIDResetScaling
 bool Property ResetScaling = false Auto Hidden
@@ -278,15 +305,29 @@ Event OnPageReset(string page)
 
 			AddHeaderOption("$HP_MCM_BodyMorphingHeader")
 
+				AddTextOption("0=0%, 1=100%", "", OPTION_FLAG_DISABLED)
+				AddTextOption("$HP_MCM_PregnancyBreast", "", OPTION_FLAG_DISABLED)
 				OIDBreastsSH = AddSliderOption("$HP_MCM_BreastsSH", BreastsSH, "{2}")
 				OIDBreastsSSH = AddSliderOption("$HP_MCM_BreastsSSH", BreastsSSH, "{2}")
 				OIDBreastGravity = AddSliderOption("$HP_MCM_BreastGravity", BreastGravity, "{2}")
 				OIDNippleAreola = AddSliderOption("$HP_MCM_NippleAreola", NippleAreola, "{2}")
+				AddEmptyOption()
+				
+				AddTextOption("$HP_MCM_PregnancyBelly", "", OPTION_FLAG_DISABLED)
+				OIDChubbyArms = AddSliderOption("$HP_MCM_ChubbyArms", ChubbyArms, "{2}")
+				OIDChubbyWaist = AddSliderOption("$HP_MCM_ChubbyWaist", ChubbyWaist, "{2}")
+				OIDChubbyButt = AddSliderOption("$HP_MCM_ChubbyButt", ChubbyButt, "{2}")
+				OIDChubbyLegs = AddSliderOption("$HP_MCM_ChubbyLegs", ChubbyLegs, "{2}")
+				OIDButtShape2 = AddSliderOption("$HP_MCM_ButtShape2", ButtShape2, "{2}")
+				OIDPregnancyBelly = AddSliderOption("$HP_MCM_PregnancyBelly", PregnancyBelly, "{2}")
+				AddEmptyOption()
+
+				AddTextOption("$HP_MCM_PregnancyMilk", "", OPTION_FLAG_DISABLED)
+				OIDDoubleMelon = AddSliderOption("$HP_MCM_DoubleMelon", DoubleMelon, "{2}")
 				OIDNipplePerkiness = AddSliderOption("$HP_MCM_NipplePerkiness", NipplePerkiness, "{2}")
 				OIDNippleLength = AddSliderOption("$HP_MCM_NippleLength", NippleLength, "{2}")
-				OIDPregnancyBelly = AddSliderOption("$HP_MCM_PregnancyBelly", PregnancyBelly, "{2}")
-
 				AddEmptyOption()
+				
 				OIDResetScaling = AddToggleOption("$HP_MCM_ResetScaling", ResetScaling)
 				
 	ElseIf page == "$HP_MCM_Pages2"
@@ -517,6 +558,13 @@ Event OnOptionSliderAccept(int option, float floatValue)
 		hentaiPregnancyQuest.UpdateTargetSize()
 		hentaiPregnancyQuest.UpdateSize()
 		
+	ElseIf option == OIDDoubleMelon
+		
+		SetSliderOptionValue(option, floatValue, "{2}")
+		DoubleMelon = floatValue
+		hentaiPregnancyQuest.UpdateTargetSize()
+		hentaiPregnancyQuest.UpdateSize()
+		
 	ElseIf option == OIDNipplePerkiness
 		
 		SetSliderOptionValue(option, floatValue, "{2}")
@@ -528,6 +576,41 @@ Event OnOptionSliderAccept(int option, float floatValue)
 		
 		SetSliderOptionValue(option, floatValue, "{2}")
 		NippleLength = floatValue
+		hentaiPregnancyQuest.UpdateTargetSize()
+		hentaiPregnancyQuest.UpdateSize()
+		
+	ElseIf option == OIDChubbyArms
+		
+		SetSliderOptionValue(option, floatValue, "{2}")
+		ChubbyArms = floatValue
+		hentaiPregnancyQuest.UpdateTargetSize()
+		hentaiPregnancyQuest.UpdateSize()
+		
+	ElseIf option == OIDChubbyWaist
+		
+		SetSliderOptionValue(option, floatValue, "{2}")
+		ChubbyWaist = floatValue
+		hentaiPregnancyQuest.UpdateTargetSize()
+		hentaiPregnancyQuest.UpdateSize()
+		
+	ElseIf option == OIDChubbyButt
+		
+		SetSliderOptionValue(option, floatValue, "{2}")
+		ChubbyButt = floatValue
+		hentaiPregnancyQuest.UpdateTargetSize()
+		hentaiPregnancyQuest.UpdateSize()
+		
+	ElseIf option == OIDChubbyLegs
+		
+		SetSliderOptionValue(option, floatValue, "{2}")
+		ChubbyLegs = floatValue
+		hentaiPregnancyQuest.UpdateTargetSize()
+		hentaiPregnancyQuest.UpdateSize()
+		
+	ElseIf option == OIDButtShape2
+		
+		SetSliderOptionValue(option, floatValue, "{2}")
+		ButtShape2 = floatValue
 		hentaiPregnancyQuest.UpdateTargetSize()
 		hentaiPregnancyQuest.UpdateSize()
 		
@@ -688,6 +771,13 @@ Event OnOptionSliderOpen(int option)
 		SetSliderDialogRange(0, 1)
 		SetSliderDialogInterval(0.1)
 		
+	ElseIf option == OIDDoubleMelon
+		
+		SetSliderDialogStartValue(DoubleMelon)
+		SetSliderDialogDefaultValue(DoubleMelonDefault)
+		SetSliderDialogRange(0, 1)
+		SetSliderDialogInterval(0.1)
+		
 	ElseIf option == OIDNipplePerkiness
 		
 		SetSliderDialogStartValue(NipplePerkiness)
@@ -700,6 +790,41 @@ Event OnOptionSliderOpen(int option)
 		SetSliderDialogStartValue(NippleLength)
 		SetSliderDialogDefaultValue(NippleLengthDefault)
 		SetSliderDialogRange(-10, 1)
+		SetSliderDialogInterval(0.1)
+		
+	ElseIf option == OIDChubbyArms
+		
+		SetSliderDialogStartValue(ChubbyArms)
+		SetSliderDialogDefaultValue(ChubbyArmsDefault)
+		SetSliderDialogRange(0, 1)
+		SetSliderDialogInterval(0.1)
+		
+	ElseIf option == OIDChubbyWaist
+		
+		SetSliderDialogStartValue(ChubbyWaist)
+		SetSliderDialogDefaultValue(ChubbyWaistDefault)
+		SetSliderDialogRange(0, 1)
+		SetSliderDialogInterval(0.1)
+		
+	ElseIf option == OIDChubbyButt
+		
+		SetSliderDialogStartValue(ChubbyButt)
+		SetSliderDialogDefaultValue(ChubbyButtDefault)
+		SetSliderDialogRange(0, 1)
+		SetSliderDialogInterval(0.1)
+		
+	ElseIf option == OIDChubbyLegs
+		
+		SetSliderDialogStartValue(ChubbyLegs)
+		SetSliderDialogDefaultValue(ChubbyLegsDefault)
+		SetSliderDialogRange(0, 1)
+		SetSliderDialogInterval(0.1)
+		
+	ElseIf option == OIDButtShape2
+		
+		SetSliderDialogStartValue(ButtShape2)
+		SetSliderDialogDefaultValue(ButtShape2Default)
+		SetSliderDialogRange(0, 1)
 		SetSliderDialogInterval(0.1)
 		
 	ElseIf option == OIDPregnancyBelly

@@ -430,13 +430,22 @@ function ResetBody(Actor ActorRef)
 	BodyMod.SetNodeScale(ActorRef, "NPC L Breast", 1)
 	BodyMod.SetNodeScale(ActorRef, "NPC R Breast", 1)
 	;morphs scale
+	;pregnancy breast
 	BodyMod.ClearMorphScale(ActorRef, "BreastsSH")
 	BodyMod.ClearMorphScale(ActorRef, "BreastsSSH")
 	BodyMod.ClearMorphScale(ActorRef, "BreastGravity")
 	BodyMod.ClearMorphScale(ActorRef, "NippleAreola")
+	;pregnancy belly
+	BodyMod.ClearMorphScale(ActorRef, "ChubbyArms")
+	BodyMod.ClearMorphScale(ActorRef, "ChubbyWaist")
+	BodyMod.ClearMorphScale(ActorRef, "ChubbyButt")
+	BodyMod.ClearMorphScale(ActorRef, "ChubbyLegs")
+	BodyMod.ClearMorphScale(ActorRef, "ButtShape2")
+	BodyMod.ClearMorphScale(ActorRef, "PregnancyBelly")
+	;pregnancy milk
+	BodyMod.ClearMorphScale(ActorRef, "DoubleMelon")
 	BodyMod.ClearMorphScale(ActorRef, "NipplePerkiness")
 	BodyMod.ClearMorphScale(ActorRef, "NippleLength")
-	BodyMod.ClearMorphScale(ActorRef, "PregnancyBelly")
 
 	; reset SexLab Inflation Framework  
 	int SLIF_unregisterActor = ModEvent.Create("SLIF_unregisterActor")
