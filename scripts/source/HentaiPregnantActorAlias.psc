@@ -9,9 +9,13 @@ Actor Property FatherRef Auto
 ;pregnancy/soulgem belly
 Float CurrentBreastSize = 1.0
 Float CurrentBellySize = 1.0
+Float CurrentBodyWeight = 1.0
+Float InitialBodyWeight = 0.0
+Float NewBodyWeight = 0.0
 
 Float IncrBreastRate = 0.0
 Float IncrBellyRate = 0.0
+Float IncrBodyWeight = 0.0
 
 Int pregnancyId = -1
 Int DurationHours = 0
@@ -25,6 +29,7 @@ Int SoulGemCount = 0
 ;pregnancy/soulgem max belly
 float TargetBreastSize = 0.0
 float TargetBellySize = 0.0
+float TargetBodyWeight = 0.0
 
 float lastGameTime = 0.0
 float CumInflation = 0.0
@@ -34,6 +39,7 @@ bool fertilised = false
 bool FatherIsCreature = false
 bool BreastScaling = true
 bool BellyScaling = true
+bool BodyWeightScaling = true
 
 Event OnInit()
 	GoToState("ReadyForPregnancy")
@@ -56,6 +62,7 @@ auto State ReadyForPregnancy
 		FatherIsCreature = false
 		BreastScaling = true
 		BellyScaling = true
+		BodyWeightScaling = true
 		SoulGemCount = 0
 		Clear()
 		;Debug.Notification("HentaiPregnantActorAlias Normal")
@@ -294,10 +301,51 @@ function updateSizeBelly()
 	endIf
 endFunction
 
+function incrWeight()
+	if CurrentBodyWeight < TargetBodyWeight
+		NewBodyWeight = CurrentBodyWeight + IncrBodyWeight
+	endIf
+	updateWeight(NewBodyWeight)
+endFunction
+
+bool function deflatePregnantWeight()
+	While CurrentBodyWeight > InitialBodyWeight
+		decrWeight()
+		Utility.Wait(0.2)
+	EndWhile
+	return true
+endFunction
+
+function decrWeight()
+	if CurrentBodyWeight > InitialBodyWeight
+		NewBodyWeight = CurrentBodyWeight - IncrBodyWeight
+	endIf
+	updateWeight(NewBodyWeight)
+endFunction
+
+function updateWeight(float inWeight)
+	;constrain weight to either limit if necessary, then update
+	if BodyWeightScaling && ActorRef == HentaiP.PlayerRef
+		if inWeight > HentaiP.config.MaxScaleBodyWeight
+			inWeight = HentaiP.config.MaxScaleBodyWeight
+		endIf
+		
+		if inWeight < InitialBodyWeight
+			inWeight = InitialBodyWeight
+		EndIf
+		
+		CurrentBodyWeight = inWeight
+		float NeckDelta = (CurrentBodyWeight / 100) - (inWeight / 100)
+		ActorRef.GetActorBase().SetWeight(inWeight)
+		ActorRef.UpdateWeight(NeckDelta)
+	endIf
+endFunction
+
 ; called on player load game/changecell to refresh body, usefull when using NIE scaling
 function recheckBody()
 	updateSizeBelly()
 	updateSizeBreast()
+	updateWeight(CurrentBodyWeight)
 endFunction
 
 bool function PregDurationCalc()
@@ -310,11 +358,14 @@ endFunction
 bool function targetSizeCalc()
 	TargetBreastSize = HentaiP.config.MaxScaleBreasts
 	TargetBellySize = HentaiP.config.MaxScaleBelly
+	TargetBodyWeight = HentaiP.config.MaxScaleBodyWeight
 	
 	float BreastSizeDelta = TargetBreastSize - CurrentBreastSize
 	float BellySizeDelt = TargetBellySize - CurrentBellySize
-	IncrBreastRate = BreastSizeDelta / (DurationHours / 2)
-	IncrBellyRate = BellySizeDelt / (DurationHours / 2)
+	float BodyWeightDelt = TargetBodyWeight - InitialBodyWeight
+	IncrBreastRate = BreastSizeDelta / ((DurationHours * 3) / 4)
+	IncrBellyRate = BellySizeDelt / ((DurationHours * 3) / 4)
+	IncrBodyWeight = BodyWeightDelt / ((DurationHours * 3) / 4)
 	
 	return true
 endFunction
@@ -349,12 +400,17 @@ function setBellyScaling(bool value = true)
 	BellyScaling = value
 endFunction
 
+function setBodyWeightScaling()
+	BodyWeightScaling = HentaiP.config.BodyWeightScaling
+endFunction
+
 State Inseminated
 	Event OnBeginState()
 		ActorRef = GetActorRef()
 		ActorRef.AddToFaction(HentaiP.HentaiPregnantFaction)
 		setBreastScaling()
 		setBellyScaling()
+		setBodyWeightScaling()
 	
 		;old cuminflation
 		;int random = Utility.RandomInt(0, 100)
@@ -423,8 +479,12 @@ State Pregnant
 		GetActorRef().SetFactionRank(HentaiP.HentaiPregnantFaction, 3)
 		;Debug.Notification("HentaiPregnantActorAlias Pregnant")
 		
+		InitialBodyWeight = ActorRef.GetActorBase().GetWeight()
+		CurrentBodyWeight = InitialBodyWeight
+
 		CurrentBellySize = 1
 		CurrentBreastSize = 1
+
 		PregDurationCalc()
 		targetSizeCalc()
 		lastGameTime = Utility.GetCurrentGameTime()
@@ -449,6 +509,7 @@ State Pregnant
 				CumInflation -= HentaiP.config.CumAbsorb
 				incrSizeBreast()
 				incrSizeBelly()
+				incrWeight()
 				hourspassed -= 1
 			EndWhile
 			lastGameTime = currentTime
@@ -462,7 +523,7 @@ State Pregnant
 					ActorRef.Addspell(HentaiP.HentaiSoulgemBirthSpell)
 				EndIf
 				
-				If CurrentHour >= DurationHours/3 && HentaiP.config.PCMilking
+				If HentaiP.config.PCMilking && CurrentHour >= (DurationHours * HentaiP.config.MilkBegin / 100)
 					;hand milking
 					if !ActorRef.HasSpell(HentaiP.HentaiMilkSquirtSpellList.GetAt(0) as Spell)
 						if HentaiP.config.EnableMessages
@@ -478,7 +539,7 @@ State Pregnant
 			EndIf
 			
 			if (ActorRef == HentaiP.PlayerRef && HentaiP.config.PCMilking) || (ActorRef != HentaiP.PlayerRef && HentaiP.config.NPCMilking)
-				If CurrentHour > DurationHours/3
+				If CurrentHour >= (DurationHours * HentaiP.config.MilkBegin / 100)
 					setMilk(getMilk() + 1)
 					If ActorRef == HentaiP.PlayerRef
 						if HentaiP.config.EnableMessages
@@ -568,6 +629,10 @@ State PostPregnancy
 		PostDurationHours = (CurrentHour * 0.2 * (1 - Utility.RandomFloat(-0.1, 0.1))) as int
 		PostDurationHours += CurrentHour
 		IncrBreastRate = BreastSizeDelta / PostDurationHours
+		float BodyWeightDelta = CurrentBodyWeight - InitialBodyWeight
+		IncrBodyWeight = (BodyWeightDelta / (PostDurationHours as float)) * 6
+		;not sure why the generated increment is so small
+		;multiplying by 6 gives roughly the correct delta for returning to the original weight
 		
 		lastGameTime = Utility.GetCurrentGameTime()
 		
@@ -589,6 +654,7 @@ State PostPregnancy
 			CurrentHour += hourspassed
 			While hourspassed > 0
 				CumInflation -= HentaiP.config.CumAbsorb
+				decrWeight()
 				decrSizeBreast()
 				updateSizeBelly()
 				hourspassed -= 1
@@ -627,6 +693,7 @@ State PostPregnancy
 		if HentaiP.config.EnableMessages
 			Debug.Notification(ActorRef.GetDisplayName() + HentaiP.Strings.ShowHentaiPregnantActorAliasStrings(3))
 		endif
+		updateWeight(InitialBodyWeight)
 	endEvent	
 EndState
 
@@ -649,6 +716,7 @@ State ClearPregnancy
 			EndIf
 		endif
 
+		updateWeight(InitialBodyWeight)
 		HentaiP.ResetBody(ActorRef)
 		GoToState("ReadyForPregnancy")
 	EndEvent

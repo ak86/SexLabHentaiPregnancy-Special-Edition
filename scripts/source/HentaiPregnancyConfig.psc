@@ -9,7 +9,6 @@ HentaiPregnancy Property hentaiPregnancyQuest auto
 int OIDEnableMessages
 bool Property EnableMessages = true Auto Hidden
 
-
 int OIDMilkpumpsStrip
 bool Property MilkpumpsStrip = false Auto Hidden
 
@@ -21,92 +20,99 @@ int Property MilkpumpsCuminflationMode = 0 Auto Hidden
 string[] MilkpumpsCuminflationOptions
 
 ;nie/nio node scaling
-Float Property MaxScaleBelly = 5.0 Auto Hidden
-Float MaxScaleBellyDefault = 5.0
 int OIDMaxScaleBelly
+Float Property MaxScaleBelly = 3.0 Auto Hidden
+Float MaxScaleBellyDefault = 3.0
 
+int OIDMaxScaleBreasts
 Float Property MaxScaleBreasts = 3.0 Auto Hidden
 Float MaxScaleBreastsDefault = 3.0
-int OIDMaxScaleBreasts
+
+int OIDMaxScaleBodyWeight
+Float Property MaxScaleBodyWeight = 50.0 Auto Hidden
+Float MaxScaleBodyWeightDefault = 50.0
 
 int OIDBreastScaling
-bool Property BreastScaling = true Auto Hidden
+bool Property BreastScaling = false Auto Hidden
 
 int OIDBellyScaling
-bool Property BellyScaling = true Auto Hidden
+bool Property BellyScaling = false Auto Hidden
+
+int OIDBodyWeightScaling
+bool Property BodyWeightScaling = false Auto Hidden
 
 ;morph scaling
 ;pregnancy breast
+int OIDBreastsSH
 Float Property BreastsSH = 0.5 Auto Hidden
 Float BreastsSHDefault = 0.5
-int OIDBreastsSH
 
+int OIDBreastsSSH
 Float Property BreastsSSH = 0.5 Auto Hidden
 Float BreastsSSHDefault = 0.5
-int OIDBreastsSSH
 
+int OIDBreastGravity
 Float Property BreastGravity = 0.5 Auto Hidden
 Float BreastGravityDefault = 0.5
-int OIDBreastGravity
 
+int OIDNippleAreola
 Float Property NippleAreola = 1.0 Auto Hidden
 Float NippleAreolaDefault = 1.0
-int OIDNippleAreola
 
 ;pregnancy belly
+int OIDChubbyArms
 Float Property ChubbyArms = 0.5 Auto Hidden
 Float ChubbyArmsDefault = 0.5
-int OIDChubbyArms
 
 Float Property ChubbyWaist = 0.5 Auto Hidden
 Float ChubbyWaistDefault = 0.5
 int OIDChubbyWaist
 
+int OIDChubbyButt
 Float Property ChubbyButt = 0.5 Auto Hidden
 Float ChubbyButtDefault = 0.5
-int OIDChubbyButt
 
+int OIDChubbyLegs
 Float Property ChubbyLegs = 0.5 Auto Hidden
 Float ChubbyLegsDefault = 0.5
-int OIDChubbyLegs
 
+int OIDButtShape2
 Float Property ButtShape2 = 0.5 Auto Hidden
 Float ButtShape2Default = 0.5
-int OIDButtShape2
 
+int OIDPregnancyBelly
 Float Property PregnancyBelly = 0.5 Auto Hidden
 Float PregnancyBellyDefault = 0.5
-int OIDPregnancyBelly
 
 ;pregnancy milk
+int OIDDoubleMelon
 Float Property DoubleMelon = 1.0 Auto Hidden
 Float DoubleMelonDefault = 1.0
-int OIDDoubleMelon
 
+int OIDNipplePerkiness
 Float Property NipplePerkiness = 1.0 Auto Hidden
 Float NipplePerkinessDefault = 1.0
-int OIDNipplePerkiness
 
+int OIDNippleLength
 Float Property NippleLength = 1.0 Auto Hidden
 Float NippleLengthDefault = 1.0
-int OIDNippleLength
 
 int OIDResetScaling
 bool Property ResetScaling = false Auto Hidden
 
 ; ----- Pregnancy settings -----
 
+int OIDPregnancyChance
 int Property PregnancyChance = 15 Auto Hidden
 int PregnancyChanceDefault = 15
-int OIDPregnancyChance
 
+int OIDChildChance
 int Property ChildChance = 100 Auto Hidden
 int ChildChanceDefault = 100
-int OIDChildChance
 
+int OIDPregnancyDuration
 int Property PregnancyDuration = 7 Auto Hidden
 int PregnancyDurationDefault = 7
-int OIDPregnancyDuration
 
 int OIDPregnancyActorOptions
 int Property PregnancyActorOption = 0 Auto Hidden
@@ -148,17 +154,21 @@ bool Property MilkAllPC = false Auto Hidden
 int OIDMilkAllNPC
 bool Property MilkAllNPC = false Auto Hidden
 
-string[] BodyTypeOptions
+int OIDMilkBegin
+int property MilkBegin = 50 Auto Hidden
+int MilkBeginDefault = 50
+
 int OIDBodyTypeOptions
 int Property BodyTypeOption = 0 Auto Hidden
+string[] BodyTypeOptions
 
 
 
 ; ----- Cum Inflation settings -----
 
+int OIDCumInflationChance
 int Property CumInflationChance = 50 Auto Hidden
 int CumInflationChanceDefault = 50
-int OIDCumInflationChance
 
 int OIDCumInflationCreaturesOnly
 bool Property CumInflationCreaturesOnly = true Auto Hidden
@@ -166,53 +176,53 @@ bool Property CumInflationCreaturesOnly = true Auto Hidden
 int OIDCumInflation
 bool Property CumInflation = true Auto Hidden
 
+int OIDCumSizeBase
 Float Property CumSizeBase = 15.0 Auto Hidden
 Float CumSizeBaseDefault = 15.0
-int OIDCumSizeBase
 
+int OIDCumSizeRandomizer
 Float Property CumSizeRandomizer = 50.0 Auto Hidden
 Float CumSizeRandomizerDefault = 50.0
-int OIDCumSizeRandomizer
 
+int OIDCumSizeCreatureModifier
 Float Property CumSizeCreatureModifier = 10.0 Auto Hidden
 Float CumSizeCreatureModifierDefault = 10.0
-int OIDCumSizeCreatureModifier
 
+int OIDCumSizeEstrusModifier
 Float Property CumSizeEstrusModifier = 100.0 Auto Hidden
 Float CumSizeEstrusModifierDefault = 100.0
-int OIDCumSizeEstrusModifier
 
+int OIDCumAbsorb
 Float Property CumAbsorb = 10.0 Auto Hidden
 Float CumAbsorbDefault = 10.0
-int OIDCumAbsorb
 
+int OIDCumDrain
 Float Property CumDrain = 10.0 Auto Hidden
 Float CumDrainDefault = 10.0
-int OIDCumDrain
 
+int OIDCumBellySizeMax
 Float Property CumBellySizeMax = 3.5 Auto Hidden
 Float CumBellySizeMaxDefault = 3.5
-int OIDCumBellySizeMax
 
+int OIDCumBellySizeMaxRandomizer
 Float Property CumBellySizeMaxRandomizer = 10.0 Auto Hidden
 Float CumBellySizeMaxRandomizerDefault = 10.0
-int OIDCumBellySizeMaxRandomizer
 
+int OIDCumBellySizePerCum
 Float Property CumBellySizePerCum = 1.5 Auto Hidden
 Float CumBellySizePerCumDefault = 1.5
-int OIDCumBellySizePerCum
 
 
 
 ; ----- Soul Gem settings -----
 
+int OIDSoulGemDuration
 int Property SoulGemDuration = 20 Auto Hidden
 int SoulGemDurationDefault = 20
-int OIDSoulGemDuration
 
+int OIDSoulGemBellySize
 Float Property SoulGemBellySize = 1.0 Auto Hidden
 Float SoulGemBellySizeDefault = 1.0
-int OIDSoulGemBellySize
 
 int OIDSoulGemPregnancy
 bool Property SoulGemPregnancy = false Auto Hidden
@@ -232,7 +242,7 @@ Event OnConfigInit()
 EndEvent
 
 int function GetVersion()
-	return 20180701
+	return 20190323
 endFunction
 
 event OnVersionUpdate(int a_version)
@@ -301,6 +311,8 @@ Event OnPageReset(string page)
 
 				OIDBreastScaling = AddToggleOption("$HP_MCM_BreastScaling", BreastScaling)
 				OIDMaxScaleBreasts = AddSliderOption("$HP_MCM_MaxScaleBreasts", MaxScaleBreasts, "{1}")
+				OIDBodyWeightScaling = AddToggleOption("$HP_MCM_BodyWeightScaling", BodyWeightScaling)
+				OIDMaxScaleBodyWeight = AddSliderOption("$HP_MCM_MaxScaleBodyWeight", MaxScaleBodyWeight, "{1}")
 				AddEmptyOption()
 
 			AddHeaderOption("$HP_MCM_BodyMorphingHeader")
@@ -336,9 +348,11 @@ Event OnPageReset(string page)
 		
 		SetCursorPosition(0)
 			AddHeaderOption("$HP_MCM_FemaleCycleHeader")
+			;OIDPlayerFemaleCycle = AddToggleOption("$HP_MCM_PlayerFemaleCycle", PlayerFemaleCycle)
 			
 		SetCursorPosition(1)
 			AddHeaderOption("$HP_MCM_FemaleCycleEffectsHeader")
+			AddTextOption("$HP_MCM_PlayerPregnancyChance", PregnancyChance + StorageUtil.GetIntValue(hentaiPregnancyQuest.PlayerRef, "hp_fetility_modifier", 0) + "%", OPTION_FLAG_DISABLED)
 
 	ElseIf page == "$HP_MCM_Pages3"
 		
@@ -373,6 +387,7 @@ Event OnPageReset(string page)
 			OIDNPCMilking = AddToggleOption("$HP_MCM_NPCMilking", NPCMilking)
 			OIDMilkAllPC = AddToggleOption("$HP_MCM_MilkAllPC", MilkAllPC)
 			OIDMilkAllNPC = AddToggleOption("$HP_MCM_MilkAllNPC", MilkAllNPC)
+			OIDMilkBegin = AddSliderOption("$HP_MCM_MilkBegin", MilkBegin, "{0}")
 			OIDBodyTypeOptions = AddMenuOption("$HP_MCM_MilkingBodyTypeOptions", BodyTypeOptions[BodyTypeOption])
 		
 	ElseIf page == "$HP_MCM_Pages5"
@@ -466,6 +481,11 @@ Event OnOptionSliderAccept(int option, float floatValue)
 		SetSliderOptionValue(option, floatValue, "{0}%")
 		ChildChance = value
 		
+	ElseIf option == OIDMilkBegin
+		
+		SetSliderOptionValue(option, floatValue, "{0}%")
+		MilkBegin = floatValue as int
+		
 	ElseIf option == OIDCumInflationChance
 		
 		SetSliderOptionValue(option, floatValue, "{0}%")
@@ -527,6 +547,13 @@ Event OnOptionSliderAccept(int option, float floatValue)
 		
 		SetSliderOptionValue(option, floatValue, "{1}")
 		MaxScaleBreasts = floatValue
+		hentaiPregnancyQuest.UpdateTargetSize()
+		hentaiPregnancyQuest.UpdateSize()
+		
+	ElseIf option == OIDMaxScaleBodyWeight
+	
+		SetSliderOptionValue(option, floatValue, "{1}")
+		MaxScaleBodyWeight = floatValue
 		hentaiPregnancyQuest.UpdateTargetSize()
 		hentaiPregnancyQuest.UpdateSize()
 		
@@ -658,6 +685,13 @@ Event OnOptionSliderOpen(int option)
 		SetSliderDialogDefaultValue(ChildChanceDefault)
 		SetSliderDialogRange(0, 100)
 		SetSliderDialogInterval(1)
+	
+	ElseIf option == OIDMilkBegin
+	
+		SetSliderDialogStartValue(MilkBegin)
+		SetSliderDialogDefaultValue(MilkBeginDefault)
+		SetSliderDialogRange(0, 100)
+		SetSliderDialogInterval(1)
 		
 	ElseIf option == OIDCumInflationChance
 		
@@ -743,6 +777,13 @@ Event OnOptionSliderOpen(int option)
 		SetSliderDialogRange(2, 10)
 		SetSliderDialogInterval(0.1)
 				
+	ElseIf option == OIDMaxScaleBodyWeight
+	
+		SetSliderDialogStartValue(MaxScaleBodyWeight)
+		SetSliderDialogDefaultValue(MaxScaleBodyWeightDefault)
+		SetSliderDialogRange(0, 100)
+		SetSliderDialogInterval(1)
+	
 	ElseIf option == OIDBreastsSH
 		
 		SetSliderDialogStartValue(BreastsSH)
@@ -936,6 +977,12 @@ event OnOptionSelect(int option)
 		SetToggleOptionValue(OIDBreastScaling, BreastScaling)
 		hentaiPregnancyQuest.UpdateBreastScaling()
 		
+	elseIf option == OIDBodyWeightScaling
+	
+		BodyWeightScaling = !BodyWeightScaling
+		SetToggleOptionValue(OIDBodyWeightScaling, BodyWeightScaling)
+		hentaiPregnancyQuest.UpdateBodyWeightScaling()
+		
 	elseIf option == OIDResetScaling
 	
 		ResetScaling = !ResetScaling
@@ -1051,6 +1098,9 @@ Event OnOptionHighlight(int option)
 	ElseIf option == OIDBodyTypeOptions
 		SetInfoText("$HP_MCM_MilkingBodyTypeOptionDescription")
 		
+	ElseIf option == OIDMilkBegin
+		SetInfoText("$HP_MCM_MilkBeginDescription")
+		
 	ElseIf option == OIDChildChance
 		SetInfoText("$HP_MCM_PregnancyChildChanceDescription")
 		
@@ -1096,6 +1146,9 @@ Event OnOptionHighlight(int option)
 	ElseIf option == OIDMaxScaleBreasts
 		SetInfoText("$HP_MCM_MaxScaleBreastsDescription")
 		
+	ElseIf option == OIDMaxScaleBodyWeight
+		SetInfoText("$HP_MCM_MaxScaleBodyWeightDescription")
+	
 	ElseIf option == OIDPregnancyActorOptions
 		SetInfoText("$HP_MCM_PregnancyActorOptionDescription")	
 		
@@ -1117,6 +1170,9 @@ Event OnOptionHighlight(int option)
 	ElseIf option == OIDBellyScaling
 		SetInfoText("$HP_MCM_BellyScalingDescription")	
 		
+	ElseIf option == OIDBodyWeightScaling
+		SetInfoText("$HP_MCM_BodyWeightScalingDescription")
+    
 	ElseIf option == OIDPCMilking
 		SetInfoText("$HP_MCM_PCMilkingDescription")
 		

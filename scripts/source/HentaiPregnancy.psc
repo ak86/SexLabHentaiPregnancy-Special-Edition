@@ -292,6 +292,16 @@ function UpdateBellyScaling()
 	endWhile
 endFunction
 
+function UpdateBodyWeightScaling()
+	int i = 0
+	while i < PregnantActors.Length
+		if PregnantActors[i].getMother() != none
+			PregnantActors[i].setBodyWeightScaling()
+		endIf
+		i += 1
+	endWhile
+endFunction
+
 bool function ResetScaling()
 	int i = 0
 	while i < PregnantActors.Length
@@ -312,6 +322,7 @@ function addTempPregnancyEffects(Actor ActorRef, int hoursleft, bool isvictim)
 			HentaiPregnancyStaggerSpell.cast(ActorRef)
 			SexLab.PickVoice(ActorRef).Moan(ActorRef, 0,5)
 
+			SexLab.ClearMFG(ActorRef)
 			if(isvictim)
 				;HentaiPregnancyFearSpell.cast(ActorRef)				
 			endif
@@ -359,6 +370,7 @@ function playLeftMilkEffect(Actor ActorRef)
 	UnequipItem(ActorRef, HentaiPregnancyMilkL, false, true)
 	Utility.Wait(4.0)
 	
+	SexLab.ClearMFG(ActorRef)
 	EquipItem(ActorRef, stripped, false, false)
 endfunction
 
@@ -370,6 +382,7 @@ function playNoMilkEffect(Actor ActorRef)
 	SexLab.PickVoice(ActorRef).Moan(ActorRef, 0,5)
 	Utility.Wait(12.0)
 	
+	SexLab.ClearMFG(ActorRef)
 	EquipItem(ActorRef, stripped, false, false)
 endfunction
 
@@ -386,6 +399,7 @@ function playRightMilkEffect(Actor ActorRef)
 	UnequipItem(ActorRef, HentaiPregnancyMilkR, false, true)
 	Utility.Wait(4.0)
 	
+	SexLab.ClearMFG(ActorRef)
 	EquipItem(ActorRef, stripped, false, false)
 endfunction
 
@@ -426,9 +440,13 @@ endFunction
 
 function ResetBody(Actor ActorRef)
 	;node scale
-	BodyMod.SetNodeScale(ActorRef, "NPC Belly", 1)
-	BodyMod.SetNodeScale(ActorRef, "NPC L Breast", 1)
-	BodyMod.SetNodeScale(ActorRef, "NPC R Breast", 1)
+	if config.BellyScaling
+		BodyMod.SetNodeScale(ActorRef, "NPC Belly", 1)
+	endif
+	if config.BreastScaling
+		BodyMod.SetNodeScale(ActorRef, "NPC L Breast", 1)
+		BodyMod.SetNodeScale(ActorRef, "NPC R Breast", 1)
+	endif
 	;morphs scale
 	;pregnancy breast
 	BodyMod.ClearMorphScale(ActorRef, "BreastsSH")
@@ -675,6 +693,7 @@ function endPregnancy(Actor ActorRef, int pregnancyId, bool isvictim, int durati
 	EquipItem(ActorRef, stripped, false, false)
 	
 	;allow other mods to animate actor
+	SexLab.ClearMFG(ActorRef)
 	SexLab.AllowActor(ActorRef)
 	ActorRef.RemoveFromFaction(SexLab.AnimatingFaction)
 endFunction
@@ -811,7 +830,7 @@ Event HentaiPregnancyImpregnate(string eventName, string argString, float argNum
 		while (i < actorList.Length)
 			if SexLab.GetGender(actorList[i])== 0 || treatAsMale(actorList[i], controller, anim)
 				MaleIndex = i
-			elseif actorList[i].GetLeveledActorBase().GetSex() == 1
+			elseif FemaleIndex == -1 && (actorList[i].GetLeveledActorBase().GetSex() == 1 || (anim.HasTag("Anal") && config.AllowAnal))
 				FemaleIndex = i			
 			endIf
 			i += 1
@@ -825,7 +844,7 @@ Event HentaiPregnancyImpregnate(string eventName, string argString, float argNum
 
 		if (MaleIndex >= 0 && FemaleIndex >= 0)
 			if(anim.HasTag("Creature") || anim.HasTag("Vaginal") || (anim.HasTag("Anal") && config.AllowAnal))
-				chance = config.PregnancyChance
+				chance = config.PregnancyChance + StorageUtil.GetIntValue(actorList[FemaleIndex], "hp_fetility_modifier", 0)
 			endIf
 			setPregnant(actorList[MaleIndex], actorList[FemaleIndex], victim != none, random <= chance)
 		else
@@ -856,7 +875,7 @@ Event HentaiPregnancyImpregnateS(Form ActorRef, Int Thread)
 		while (i < actorList.Length)
 			if SexLab.GetGender(actorList[i])== 0 || treatAsMale(actorList[i], controller, anim)
 				MaleIndex = i
-			elseif actorList[i].GetLeveledActorBase().GetSex() == 1
+			elseif FemaleIndex == -1 && (actorList[i].GetLeveledActorBase().GetSex() == 1 || (anim.HasTag("Anal") && config.AllowAnal))
 				FemaleIndex = i			
 			endIf
 			i += 1
@@ -869,7 +888,7 @@ Event HentaiPregnancyImpregnateS(Form ActorRef, Int Thread)
 
 		if (MaleIndex >= 0 && FemaleIndex >= 0)
 			if(anim.HasTag("Creature") || anim.HasTag("Vaginal") || (anim.HasTag("Anal") && config.AllowAnal))
-				chance = config.PregnancyChance
+				chance = config.PregnancyChance + StorageUtil.GetIntValue(actorList[FemaleIndex], "hp_fetility_modifier", 0)
 			endIf
 			setPregnant(actorList[MaleIndex], actorList[FemaleIndex], victim != none, random <= chance)
 		else

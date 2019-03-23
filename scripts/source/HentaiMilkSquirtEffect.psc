@@ -75,6 +75,7 @@ Event OnEffectStart(Actor Target, Actor Caster)
 		Debug.SendAnimationEvent(Caster, "IdleForceDefaultState")
 		
 		;allow other mods to animate actor
+		HentaiP.SexLab.ClearMFG(Caster)
 		HentaiP.SexLab.AllowActor(Caster)
 		Caster.RemoveFromFaction(HentaiP.SexLab.AnimatingFaction)
 
