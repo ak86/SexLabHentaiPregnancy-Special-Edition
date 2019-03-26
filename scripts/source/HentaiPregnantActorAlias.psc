@@ -411,6 +411,8 @@ State Inseminated
 		setBreastScaling()
 		setBellyScaling()
 		setBodyWeightScaling()
+		InitialBodyWeight = ActorRef.GetActorBase().GetWeight()
+		CurrentBodyWeight = InitialBodyWeight
 	
 		;old cuminflation
 		;int random = Utility.RandomInt(0, 100)
@@ -479,9 +481,6 @@ State Pregnant
 		GetActorRef().SetFactionRank(HentaiP.HentaiPregnantFaction, 3)
 		;Debug.Notification("HentaiPregnantActorAlias Pregnant")
 		
-		InitialBodyWeight = ActorRef.GetActorBase().GetWeight()
-		CurrentBodyWeight = InitialBodyWeight
-
 		CurrentBellySize = 1
 		CurrentBreastSize = 1
 
