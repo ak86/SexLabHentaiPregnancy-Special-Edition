@@ -314,20 +314,44 @@ bool function ResetScaling()
 endFunction
 
 function addTempPregnancyEffects(Actor ActorRef, int hoursleft, bool isvictim)
-	if( hoursleft < 48 && hoursleft > 0 && config.PregnancyEffects)
-		int random = Utility.RandomInt(0, 10)
-		if(random <= 5)
-			Utility.Wait(random)
-			;ActorRef.SetExpressionOverride(2, 100)
-			HentaiPregnancyStaggerSpell.cast(ActorRef)
-			SexLab.PickVoice(ActorRef).Moan(ActorRef, 0,5)
-
-			SexLab.ClearMFG(ActorRef)
-			if(isvictim)
-				;HentaiPregnancyFearSpell.cast(ActorRef)				
-			endif
-		endif
+;
+;	3d not loaded - who cares?
+;
+	if !ActorRef.Is3DLoaded()
+		return
 	endif
+;
+;	more than 48 hours - too early
+;
+	if hoursleft >= 48 
+		return
+	endif
+;
+;	no time left - nothing to do
+;
+	if hoursleft <= 0
+		return
+	endif
+;
+;	pregnancy effects disabled in MCM?
+;
+	if !  config.PregnancyEffects
+		return
+	endif
+;
+;	50% chance of nothing happening, even so
+;
+	int random = Utility.RandomInt(0, 10)
+	if(random > 5)
+		return
+	endif
+	Utility.Wait(random)
+;
+;	stagger, moan and clear expression afterward
+;
+	HentaiPregnancyStaggerSpell.cast(ActorRef)
+	SexLab.PickVoice(ActorRef).Moan(ActorRef, 0,5)
+	SexLab.ClearMFG(ActorRef)
 endFunction
 
 function addTempPostPregnancyEffects(Actor ActorRef, int hoursleft)
@@ -474,31 +498,56 @@ function ResetBody(Actor ActorRef)
 	endif
 endFunction
 
+form function get_form(int id, string filename)
+	if Game.GetModbyName(filename) == 255 
+		return None
+	endif
+	return Game.GetFormFromFile(id, filename)
+endfunction
+
+bool function has_spell(actor a, int id, string filename)
+	spell sp = get_form(id, filename) as spell
+	if !sp
+		return false
+	endif
+	return a.HasSpell(sp)
+endfunction
+
+bool function has_keyword(actor a, int id, string filename)
+	keyword kw = get_form(id, filename) as keyword
+	if !kw
+		return false
+	endif
+	return a.HasKeyword(kw)
+endfunction
+
 bool function setPregnant(Actor father, Actor mother, bool isvictim, bool fertilised)
 	bool ispregnant = false
+	spell sp
+	keyword kw
 
 	;Disable fertilisation(pregnancy) if target already pregnant with below mods, cuminflation will still work
 	;Estrus Chaurus+
-		if mother.HasSpell( Game.GetFormFromFile(0x19121, "EstrusChaurus.esp") as Spell )		;ChaurusBreeder spell
+		if has_spell(mother, 0x19121, "EstrusChaurus.esp") 					;ChaurusBreeder spell
 			fertilised = false
 		endif
-		if mother.HasKeyword( Game.GetFormFromFile(0x160A8, "EstrusChaurus.esp") as Keyword )	;zzEstrusParasite Keyword
+		if has_keyword(mother, 0x160A8, "EstrusChaurus.esp") 				;zzEstrusParasite Keyword
 			fertilised = false
 		endif
 	
 	;Estrus Spider+
-		if mother.HasSpell( Game.GetFormFromFile(0x4e255, "EstrusSpider.esp") as Spell )		;SpiderBreeder spell
+		if has_spell(mother, 0x4e255, "EstrusSpider.esp") 					;SpiderBreeder spell
 			fertilised = false
 		endif
-		if mother.HasKeyword( Game.GetFormFromFile(0x4F2A3, "EstrusSpider.esp") as Keyword )	;zzEstrusSpiderParasiteKWD Keyword
+		if has_keyword(mother, 0x4F2A3, "EstrusSpider.esp") 				;zzEstrusSpiderParasiteKWD Keyword
 			fertilised = false
 		endif
 	
 	;Estrus Dwemer+
-		if mother.HasSpell( Game.GetFormFromFile(0x4e255, "EstrusDwemer.esp") as Spell )		;DwemerBreeder spell
+		if has_spell(mother, 0x4e255, "EstrusDwemer.esp") 					;DwemerBreeder spell
 			fertilised = false
 		endif
-		if mother.HasKeyword( Game.GetFormFromFile(0x4F2A3, "EstrusDwemer.esp") as Keyword )	;zzEstrusDwemerParasiteKWD Keyword
+		if has_keyword(mother, 0x4F2A3, "EstrusDwemer.esp") 				;zzEstrusDwemerParasiteKWD Keyword
 			fertilised = false
 		endif
 
@@ -699,57 +748,82 @@ function endPregnancy(Actor ActorRef, int pregnancyId, bool isvictim, int durati
 endFunction
 
 function NpcMilking(Actor Caster)
-	If (!Caster.IsInCombat() && !Caster.IsOnMount() && !Caster.IsInFaction(SexLab.AnimatingFaction))
-		if (Caster.IsWeaponDrawn())
-			Caster.SheatheWeapon()
-		endIf
-		Caster.Setunconscious(true)
+;
+;	not in combat, on horseback or during sex
+;
+	If Caster.IsInCombat() || Caster.IsOnMount() || Caster.IsInFaction(SexLab.AnimatingFaction)
+		return
+	endif
 
-		;prevent other mods form interrupting milking
-		SexLab.ForbidActor(Caster)
-		Caster.AddToFaction(SexLab.AnimatingFaction)
-		
-		Debug.SendAnimationEvent(Caster,"hentaipregnancyZaZAPCHorFC")
-		
-		if Caster.GetFactionRank(HentaiLactatingFaction) > 0
-			if(Utility.RandomInt(0, 1) == 1)	
-				playLeftMilkEffect(Caster)
-			else
-				playRightMilkEffect(Caster)
-			endif
-			
-			int howmuchtomilk = 1
-			if config.MilkAllNPC
-				howmuchtomilk = Caster.GetFactionRank(HentaiLactatingFaction)
-			endif
-			
-			Caster.ModFactionRank(HentaiLactatingFaction, -howmuchtomilk)
-			
-			if Game.GetModbyName("HearthFires.esm") != 255 
-				Caster.AddItem(Game.GetFormFromFile(0x3534, "HearthFires.esm"), howmuchtomilk)
-			endif
-		else
-			playNoMilkEffect(Caster)
-		endIf
-		
-		int i = 0
-		while i < PregnantActors.Length
-				if PregnantActors[i].GetActorRef() == Caster
-					PregnantActors[i].setMilk(PregnantActors[i].getMilk())
-					i = PregnantActors.Length
-				endIf
-			i += 1
-		endWhile
-		
-		Debug.SendAnimationEvent(Caster, "IdleForceDefaultState")
-		
-		;allow other mods to animate actor
-		SexLab.AllowActor(Caster)
-		Caster.RemoveFromFaction(SexLab.AnimatingFaction)
+	if (Caster.IsWeaponDrawn())
+		Caster.SheatheWeapon()
+	endIf
+	Caster.Setunconscious(true)
 
-		;enable npc moving
-		Caster.Setunconscious(false)
-	EndIf
+	;prevent other mods form interrupting milking
+	SexLab.ForbidActor(Caster)
+	Caster.AddToFaction(SexLab.AnimatingFaction)
+	
+	Debug.SendAnimationEvent(Caster,"hentaipregnancyZaZAPCHorFC")
+
+	play_milk_effect(caster)
+
+	int i = 0
+	while i < PregnantActors.Length
+			if PregnantActors[i].GetActorRef() == Caster
+				PregnantActors[i].setMilk(PregnantActors[i].getMilk())
+				i = PregnantActors.Length
+			endIf
+		i += 1
+	endWhile
+	
+	Debug.SendAnimationEvent(Caster, "IdleForceDefaultState")
+	
+	;allow other mods to animate actor
+	SexLab.AllowActor(Caster)
+	Caster.RemoveFromFaction(SexLab.AnimatingFaction)
+
+	;enable npc moving
+	Caster.Setunconscious(false)
+endFunction
+
+function play_milk_effect(actor caster)
+	int lactating_rank = Caster.GetFactionRank(HentaiLactatingFaction) 
+	if lactating_rank > 0
+		get_milk(caster, lactating_rank)
+	endif
+;
+;	don't do any of this if we're not in the current cell
+;	it's a waste of time and it fills the log with errors
+;
+	if !Caster.Is3DLoaded()
+		return
+	endif
+;
+;	if they're not lactating, it's easy
+;
+	if lactating_rank < 0
+		playNoMilkEffect(Caster)
+		return
+	endif
+
+	if(Utility.RandomInt(0, 1) == 1)	
+		playLeftMilkEffect(Caster)
+	else
+		playRightMilkEffect(Caster)
+	endif
+
+endFunction
+
+function get_milk(actor caster, int lactating_rank)
+	int howmuchtomilk = 1
+	if config.MilkAllNPC
+		howmuchtomilk = lactating_rank
+	endif
+	Caster.ModFactionRank(HentaiLactatingFaction, -howmuchtomilk)
+	if Game.GetModbyName("HearthFires.esm") != 255 
+		Caster.AddItem(Game.GetFormFromFile(0x3534, "HearthFires.esm"), howmuchtomilk)
+	endif
 endFunction
 
 String Function getAnimName(String _argString)
@@ -818,11 +892,8 @@ Event HentaiPregnancyImpregnate(string eventName, string argString, float argNum
 	sslBaseAnimation anim = SexLab.HookAnimation(argString)
 	
 	;impregnate if:
-	;-more than 1 actor and
-	;-separate orgasm disabled
-	;-or slso always orgasm enabled
-	if actorList.Length > 1\
-	&& (!SexLab.config.SeparateOrgasms || JsonUtil.GetIntValue("/SLSO/Config", "sl_default_always_orgasm") == 1 || (!controller.HasPlayer && JsonUtil.GetIntValue("/SLSO/Config", "sl_npcscene_always_orgasm") == 1))
+	;-more than 1 actor
+	if actorList.Length > 1
 
 		int MaleIndex = -1
 		int FemaleIndex = -1
@@ -865,9 +936,8 @@ Event HentaiPregnancyImpregnateS(Form ActorRef, Int Thread)
 	
 	;impregnate if:
 	;-more than 1 actor and
-	;-separate orgasm enabled
 	;-orgasming actor not in recieving/female position (0)
-	if actorList.Length > 1 && akActor != actorList[0] && SexLab.config.SeparateOrgasms
+	if actorList.Length > 1 && akActor != actorList[0]
 	
 		int MaleIndex = -1
 		int FemaleIndex = -1
