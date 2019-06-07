@@ -524,7 +524,7 @@ Event OnOptionSliderAccept(int option, float floatValue)
 	ElseIf option == OIDCumBellySizeMax
 		
 		SetSliderOptionValue(option, floatValue, "{1}")
-		CumBellySizeMax = value
+		CumBellySizeMax = floatValue
 		
 	ElseIf option == OIDCumBellySizeMaxRandomizer
 		
@@ -534,7 +534,7 @@ Event OnOptionSliderAccept(int option, float floatValue)
 	ElseIf option == OIDCumBellySizePerCum
 		
 		SetSliderOptionValue(option, floatValue, "{1}")
-		CumBellySizePerCum = value
+		CumBellySizePerCum = floatValue
 		
 	ElseIf option == OIDMaxScaleBelly
 		
@@ -1251,9 +1251,9 @@ string[] function getPregnancyList()
 			endif
 			;(soulgem)(post)pregnancy days, hours left
 			if hentaiPregnancyQuest.getMotherState((hentaiPregnancyQuest.PregnantActors[i].GetActorRef())) != "CumInflated"
-				plist[i] = plist[i] + hentaiPregnancyQuest.PregnantActors[i].getMother().GetLeveledActorBase().GetName() + hentaiPregnancyQuest.Strings.ShowHentaiPregnancyConfigStrings(3) + hentaiPregnancyQuest.PregnantActors[i].getFather().GetLeveledActorBase().GetName() + " ~ " + Remainder + TimeDesc
+				plist[i] = plist[i] + hentaiPregnancyQuest.PregnantActors[i].getMother().GetDisplayName() + hentaiPregnancyQuest.Strings.ShowHentaiPregnancyConfigStrings(3) + hentaiPregnancyQuest.PregnantActors[i].getFather().GetLeveledActorBase().GetName() + " ~ " + Remainder + TimeDesc
 			else
-				plist[i] = plist[i] + hentaiPregnancyQuest.PregnantActors[i].getMother().GetLeveledActorBase().GetName()
+				plist[i] = plist[i] + hentaiPregnancyQuest.PregnantActors[i].getMother().GetDisplayName()
 			endIf
 		endif
 		i += 1
