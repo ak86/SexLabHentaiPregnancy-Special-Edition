@@ -326,18 +326,21 @@ endFunction
 function updateWeight(float inWeight)
 	;constrain weight to either limit if necessary, then update
 	if BodyWeightScaling && ActorRef == HentaiP.PlayerRef
-		if inWeight > HentaiP.config.MaxScaleBodyWeight
-			inWeight = HentaiP.config.MaxScaleBodyWeight
+		;prevent weight update(and reset character breaking stuff) during these:
+		If (!ActorRef.IsInCombat() && !ActorRef.IsOnMount() && !ActorRef.IsInFaction(HentaiP.SexLab.AnimatingFaction) && !ActorRef.IsWeaponDrawn())
+			if inWeight > HentaiP.config.MaxScaleBodyWeight
+				inWeight = HentaiP.config.MaxScaleBodyWeight
+			endIf
+			
+			if inWeight < InitialBodyWeight
+				inWeight = InitialBodyWeight
+			EndIf
+			
+			CurrentBodyWeight = inWeight
+			float NeckDelta = (CurrentBodyWeight / 100) - (inWeight / 100)
+			ActorRef.GetActorBase().SetWeight(inWeight)
+			ActorRef.UpdateWeight(NeckDelta)
 		endIf
-		
-		if inWeight < InitialBodyWeight
-			inWeight = InitialBodyWeight
-		EndIf
-		
-		CurrentBodyWeight = inWeight
-		float NeckDelta = (CurrentBodyWeight / 100) - (inWeight / 100)
-		ActorRef.GetActorBase().SetWeight(inWeight)
-		ActorRef.UpdateWeight(NeckDelta)
 	endIf
 endFunction
 
