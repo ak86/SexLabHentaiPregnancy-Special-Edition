@@ -325,6 +325,7 @@ endFunction
 
 function updateWeight(float inWeight)
 	;constrain weight to either limit if necessary, then update
+	;this is probably fucked and will cause player to gain weight(Feature! lol)
 	if BodyWeightScaling && ActorRef == HentaiP.PlayerRef
 		;prevent weight update(and reset character breaking stuff) during these:
 		If (!ActorRef.IsInCombat() && !ActorRef.IsOnMount() && !ActorRef.IsInFaction(HentaiP.SexLab.AnimatingFaction) && !ActorRef.IsWeaponDrawn())
@@ -416,6 +417,13 @@ State Inseminated
 		setBodyWeightScaling()
 		InitialBodyWeight = ActorRef.GetActorBase().GetWeight()
 		CurrentBodyWeight = InitialBodyWeight
+
+		;lazy check/fix for cuminflation and milking
+		CurrentBellySize = 1
+		CurrentBreastSize = 1
+
+		PregDurationCalc()
+		targetSizeCalc()
 	
 		;old cuminflation
 		;int random = Utility.RandomInt(0, 100)

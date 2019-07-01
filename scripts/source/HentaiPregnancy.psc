@@ -893,7 +893,7 @@ Event HentaiPregnancyImpregnate(string eventName, string argString, float argNum
 	
 	;impregnate if:
 	;-more than 1 actor
-	if actorList.Length > 1
+	if actorList.Length > 1 && (anim.HasTag("Vaginal") || (anim.HasTag("Anal")))
 
 		int MaleIndex = -1
 		int FemaleIndex = -1
@@ -937,7 +937,7 @@ Event HentaiPregnancyImpregnateS(Form ActorRef, Int Thread)
 	;impregnate if:
 	;-more than 1 actor and
 	;-orgasming actor not in recieving/female position (0)
-	if actorList.Length > 1 && akActor != actorList[0]
+	if actorList.Length > 1 && akActor != actorList[0] && (anim.HasTag("Vaginal") || (anim.HasTag("Anal")))
 	
 		int MaleIndex = -1
 		int FemaleIndex = -1
