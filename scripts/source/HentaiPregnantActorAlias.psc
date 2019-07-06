@@ -555,7 +555,7 @@ State Pregnant
 						if HentaiP.config.EnableMessages
 							Debug.Notification(HentaiP.Strings.ShowHentaiPregnantActorAliasStrings(1))
 						EndIf
-					Elseif HentaiP.config.NPCMilking
+					Elseif HentaiP.config.NPCSelfMilking
 						HentaiP.NpcMilking(ActorRef)
 					EndIf
 				Else
@@ -678,7 +678,7 @@ State PostPregnancy
 						if HentaiP.config.EnableMessages
 							Debug.Notification(HentaiP.Strings.ShowHentaiPregnantActorAliasStrings(1))
 						EndIf
-					Elseif HentaiP.config.NPCMilking
+					Elseif HentaiP.config.NPCSelfMilking
 						HentaiP.NpcMilking(ActorRef)
 					EndIf
 				Else

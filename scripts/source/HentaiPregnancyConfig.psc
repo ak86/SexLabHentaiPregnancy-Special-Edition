@@ -148,6 +148,9 @@ bool Property PCMilking = true Auto Hidden
 int OIDNPCMilking
 bool Property NPCMilking = true Auto Hidden
 
+int OIDNPCSelfMilking
+bool Property NPCSelfMilking = false Auto Hidden
+
 int OIDMilkAllPC
 bool Property MilkAllPC = false Auto Hidden
 
@@ -385,6 +388,7 @@ Event OnPageReset(string page)
 			AddHeaderOption("$HP_MCM_MilkingHeader")
 			OIDPCMilking = AddToggleOption("$HP_MCM_PCMilking", PCMilking)
 			OIDNPCMilking = AddToggleOption("$HP_MCM_NPCMilking", NPCMilking)
+			OIDNPCSelfMilking = AddToggleOption("$HP_MCM_NPCSelfMilking", NPCSelfMilking)
 			OIDMilkAllPC = AddToggleOption("$HP_MCM_MilkAllPC", MilkAllPC)
 			OIDMilkAllNPC = AddToggleOption("$HP_MCM_MilkAllNPC", MilkAllNPC)
 			OIDMilkBegin = AddSliderOption("$HP_MCM_MilkBegin", MilkBegin, "{0}")
@@ -1001,6 +1005,11 @@ event OnOptionSelect(int option)
 		NPCMilking = !NPCMilking
 		SetToggleOptionValue(OIDNPCMilking, NPCMilking)
 		
+	elseIf option == OIDNPCSelfMilking
+	
+		NPCSelfMilking = !NPCSelfMilking
+		SetToggleOptionValue(OIDNPCSelfMilking, NPCSelfMilking)
+		
 	elseIf option == OIDMilkAllPC
 	
 		MilkAllPC = !MilkAllPC
@@ -1178,6 +1187,9 @@ Event OnOptionHighlight(int option)
 		
 	ElseIf option == OIDNPCMilking
 		SetInfoText("$HP_MCM_NPCMilkingDescription")
+		
+	ElseIf option == OIDNPCSelfMilking
+		SetInfoText("$HP_MCM_NPCSelfMilkingDescription")
 		
 	ElseIf option == OIDMilkAllPC
 		SetInfoText("$HP_MCM_MilkAllPCDescription")
