@@ -863,8 +863,17 @@ Event OnSexLabStart(String _eventName, String _args, Float _argc, Form _sender)
 ;			else
 ;				playRightMilkEffect(actors[0])
 ;			endif
-			actors[0].ModFactionRank(HentaiLactatingFaction, -1)
-			;feed milk jug
+
+			int howmuchtomilk = 1
+			if config.MilkAllPC && actors[0] == PlayerRef
+				howmuchtomilk = actors[0].GetFactionRank(HentaiLactatingFaction)
+			endif
+			if config.MilkAllNPC && actors[0] != PlayerRef
+				howmuchtomilk = actors[0].GetFactionRank(HentaiLactatingFaction)
+			endif
+			actors[0].ModFactionRank(HentaiLactatingFaction, -howmuchtomilk)
+			
+			;feed milk jug, once
 			if Game.GetModbyName("HearthFires.esm") != 255 
 				actors[1].equipitem(Game.GetFormFromFile(0x3534, "HearthFires.esm"), true, true)
 			endif
