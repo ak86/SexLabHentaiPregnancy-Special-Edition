@@ -112,6 +112,78 @@ function gameLoaded()
 	Strings.ResetStrings()
 endFunction
 
+Event OnKeyUp(Int KeyCode, Float HoldTime)
+	If (!Utility.IsInMenuMode() && config.Hotkey == keyCode)
+		Actor ActorRef = PlayerRef
+		If (isNotPregnant(ActorRef))
+			return
+		EndIf
+	
+		If (HoldTime > 2.0)
+			if (ActorRef.GetFactionRank(HentaiLactatingFaction) > 0)
+				;bottle milking; req HF
+				if (Game.GetModbyName("HearthFires.esm") != 255 && ActorRef.HasSpell(HentaiMilkSquirtSpellList.GetAt(1) as Spell))
+					(HentaiMilkSquirtSpellList.GetAt(1) as Spell).cast(ActorRef)
+				;hand milking
+				elseif(ActorRef.HasSpell(HentaiMilkSquirtSpellList.GetAt(0) as Spell))
+					(HentaiMilkSquirtSpellList.GetAt(0) as Spell).cast(ActorRef)
+				EndIf
+			EndIf
+		Else
+			int i = 0 
+			string Name = ActorRef.GetDisplayName()
+			while i < PregnantActors.Length
+				if PregnantActors[i].GetActorRef() == ActorRef
+					float CumInflation = PregnantActors[i].getCumInflation()/1000
+					int Milk = PregnantActors[i].getMilk()
+					int CurrentHour = PregnantActors[i].getCurrentHour()
+					int DurationHours = PregnantActors[i].getDurationHours()
+					int PostDurationHours = PregnantActors[i].getPostDurationHours()
+					int SoulGemCount = PregnantActors[i].getSoulGemCount()
+					form SoulGemSize = getSoulGemSize(i)
+					string pct = DurationHours/CurrentHour*100 as int + "%"
+					
+					string text = ""
+					if (getMotherState(ActorRef) == "PostPregnancy")
+						text += " post pregnancy period"
+						text += ", hours left (" + (PostDurationHours - CurrentHour) + ") "
+					elseif (getMotherState(ActorRef) == "Pregnant")
+						text += " pregnant with "
+						if (SoulGemCount == 0)
+							text += "baby"
+						else
+							text += SoulGemCount + " " + SoulGemSize.GetName()
+						endif
+						text += ", hours left (" + (DurationHours - CurrentHour) + ") "
+					endif
+					
+					if text != ""
+						Debug.Notification(Name + text)
+					endif
+					
+					text = ""
+					if (ActorRef.GetFactionRank(HentaiLactatingFaction) > 0)
+						text += " milk:" + ActorRef.GetFactionRank(HentaiLactatingFaction)
+					endIf
+					if (CumInflation > 0)
+						if text != ""
+							text += ","
+						endif
+						text += " cuminflation (" + CumInflation +") liters"
+					endif
+					
+					if text != ""
+						Debug.Notification(Name + text)
+					endif
+					
+					return
+				endIf
+				i += 1
+			endWhile
+		EndIf
+	EndIf
+EndEvent
+
 function setUpPregnantActors()
 	PregnantActors = new HentaiPregnantActorAlias[50]
 	PregnantActors[0] = PregnantActor00

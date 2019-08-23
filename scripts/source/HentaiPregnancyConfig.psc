@@ -9,6 +9,8 @@ HentaiPregnancy Property hentaiPregnancyQuest auto
 int OIDEnableMessages
 bool Property EnableMessages = true Auto Hidden
 
+Int Property Hotkey Auto Hidden
+
 int OIDMilkpumpsStrip
 bool Property MilkpumpsStrip = false Auto Hidden
 
@@ -299,6 +301,7 @@ Event OnPageReset(string page)
 		
 		SetCursorPosition(0)
 			OIDEnableMessages = AddToggleOption("$HP_MCM_EnableMessages", EnableMessages)
+			AddKeyMapOptionST("Hotkey", "$HP_MCM_Hotkey", Hotkey)
 			AddEmptyOption()
 
 			AddHeaderOption("$HP_MCM_MilkpumpsHeader")
@@ -1235,8 +1238,38 @@ event OnGameReload()
 	parent.OnGameReload() ; Don't forget to call the parent!
 	
 	hentaiPregnancyQuest.gameLoaded()
+	hentaiPregnancyQuest.RegisterForKey(Hotkey)
 
 endEvent
+
+state Hotkey
+	event OnKeyMapChangeST(int newKeyCode, string conflictControl, string conflictName)
+		hentaiPregnancyQuest.UnregisterForAllKeys()
+		bool continue = true
+ 
+		; Check for conflict
+		if conflictControl != ""
+			string msg
+			if conflictName != ""
+				msg = "This key is already mapped to:\n'" + conflictControl + "'\n(" + conflictName + ")\n\n Are you sure you want to continue?"
+			else
+				msg = "This key is already mapped to:\n'" + conflictControl + "'\n\n Are you sure you want to continue?"
+			endIf
+			continue = ShowMessage(msg, true, "Yes", "No")
+		endIf
+
+		; Set allowed key change
+		if continue
+			Hotkey = newKeyCode
+			SetKeyMapOptionValueST(newKeyCode)
+		endIf
+		hentaiPregnancyQuest.RegisterForKey(Hotkey)
+	endEvent
+
+	event OnHighlightST()
+		SetInfoText("Key ID " + Hotkey + "\n Shows information about player pregnancy.\n Holding Notification Key for 2 seconds toggles self milking.")
+	endEvent
+endState
 
 string[] function getPregnancyList()
 	string[] plist = new string[50]
