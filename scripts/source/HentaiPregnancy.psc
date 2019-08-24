@@ -545,6 +545,7 @@ function ResetBody(Actor ActorRef)
 	endif
 	;morphs scale
 	;pregnancy breast
+	BodyMod.ClearMorphScale(ActorRef, "Breasts")
 	BodyMod.ClearMorphScale(ActorRef, "BreastsSH")
 	BodyMod.ClearMorphScale(ActorRef, "BreastsSSH")
 	BodyMod.ClearMorphScale(ActorRef, "BreastGravity")
@@ -558,6 +559,7 @@ function ResetBody(Actor ActorRef)
 	BodyMod.ClearMorphScale(ActorRef, "PregnancyBelly")
 	;pregnancy milk
 	BodyMod.ClearMorphScale(ActorRef, "DoubleMelon")
+	BodyMod.ClearMorphScale(ActorRef, "BreastsFantasy")
 	BodyMod.ClearMorphScale(ActorRef, "NipplePerkiness")
 	BodyMod.ClearMorphScale(ActorRef, "NippleLength")
 

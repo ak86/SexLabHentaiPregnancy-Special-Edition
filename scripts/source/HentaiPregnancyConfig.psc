@@ -45,6 +45,10 @@ bool Property BodyWeightScaling = false Auto Hidden
 
 ;morph scaling
 ;pregnancy breast
+int OIDBreasts
+Float Property Breasts = 1.0 Auto Hidden
+Float BreastsDefault = 1.0
+
 int OIDBreastsSH
 Float Property BreastsSH = 0.5 Auto Hidden
 Float BreastsSHDefault = 0.5
@@ -63,24 +67,24 @@ Float NippleAreolaDefault = 1.0
 
 ;pregnancy belly
 int OIDChubbyArms
-Float Property ChubbyArms = 0.5 Auto Hidden
-Float ChubbyArmsDefault = 0.5
+Float Property ChubbyArms = 0.0 Auto Hidden
+Float ChubbyArmsDefault = 0.0
 
 Float Property ChubbyWaist = 0.5 Auto Hidden
-Float ChubbyWaistDefault = 0.5
+Float ChubbyWaistDefault = 0.0
 int OIDChubbyWaist
 
 int OIDChubbyButt
-Float Property ChubbyButt = 0.5 Auto Hidden
-Float ChubbyButtDefault = 0.5
+Float Property ChubbyButt = 0.0 Auto Hidden
+Float ChubbyButtDefault = 0.0
 
 int OIDChubbyLegs
-Float Property ChubbyLegs = 0.5 Auto Hidden
-Float ChubbyLegsDefault = 0.5
+Float Property ChubbyLegs = 0.0 Auto Hidden
+Float ChubbyLegsDefault = 0.0
 
 int OIDButtShape2
-Float Property ButtShape2 = 0.5 Auto Hidden
-Float ButtShape2Default = 0.5
+Float Property ButtShape2 = 0.0 Auto Hidden
+Float ButtShape2Default = 0.0
 
 int OIDPregnancyBelly
 Float Property PregnancyBelly = 0.5 Auto Hidden
@@ -90,6 +94,10 @@ Float PregnancyBellyDefault = 0.5
 int OIDDoubleMelon
 Float Property DoubleMelon = 1.0 Auto Hidden
 Float DoubleMelonDefault = 1.0
+
+int OIDBreastsFantasy
+Float Property BreastsFantasy = 1.0 Auto Hidden
+Float BreastsFantasyDefault = 1.0
 
 int OIDNipplePerkiness
 Float Property NipplePerkiness = 1.0 Auto Hidden
@@ -325,6 +333,7 @@ Event OnPageReset(string page)
 
 				AddTextOption("0=0%, 1=100%", "", OPTION_FLAG_DISABLED)
 				AddTextOption("$HP_MCM_PregnancyBreast", "", OPTION_FLAG_DISABLED)
+				OIDBreasts = AddSliderOption("$HP_MCM_Breasts", Breasts, "{2}")
 				OIDBreastsSH = AddSliderOption("$HP_MCM_BreastsSH", BreastsSH, "{2}")
 				OIDBreastsSSH = AddSliderOption("$HP_MCM_BreastsSSH", BreastsSSH, "{2}")
 				OIDBreastGravity = AddSliderOption("$HP_MCM_BreastGravity", BreastGravity, "{2}")
@@ -342,6 +351,7 @@ Event OnPageReset(string page)
 
 				AddTextOption("$HP_MCM_PregnancyMilk", "", OPTION_FLAG_DISABLED)
 				OIDDoubleMelon = AddSliderOption("$HP_MCM_DoubleMelon", DoubleMelon, "{2}")
+				OIDDoubleMelon = AddSliderOption("$HP_MCM_BreastsFantasy", BreastsFantasy, "{2}")
 				OIDNipplePerkiness = AddSliderOption("$HP_MCM_NipplePerkiness", NipplePerkiness, "{2}")
 				OIDNippleLength = AddSliderOption("$HP_MCM_NippleLength", NippleLength, "{2}")
 				AddEmptyOption()
@@ -564,6 +574,13 @@ Event OnOptionSliderAccept(int option, float floatValue)
 		hentaiPregnancyQuest.UpdateTargetSize()
 		hentaiPregnancyQuest.UpdateSize()
 		
+	ElseIf option == OIDBreasts
+		
+		SetSliderOptionValue(option, floatValue, "{2}")
+		Breasts = floatValue
+		hentaiPregnancyQuest.UpdateTargetSize()
+		hentaiPregnancyQuest.UpdateSize()
+		
 	ElseIf option == OIDBreastsSH
 		
 		SetSliderOptionValue(option, floatValue, "{2}")
@@ -596,6 +613,13 @@ Event OnOptionSliderAccept(int option, float floatValue)
 		
 		SetSliderOptionValue(option, floatValue, "{2}")
 		DoubleMelon = floatValue
+		hentaiPregnancyQuest.UpdateTargetSize()
+		hentaiPregnancyQuest.UpdateSize()
+		
+	ElseIf option == OIDBreastsFantasy
+		
+		SetSliderOptionValue(option, floatValue, "{2}")
+		BreastsFantasy = floatValue
 		hentaiPregnancyQuest.UpdateTargetSize()
 		hentaiPregnancyQuest.UpdateSize()
 		
@@ -791,6 +815,13 @@ Event OnOptionSliderOpen(int option)
 		SetSliderDialogRange(0, 100)
 		SetSliderDialogInterval(1)
 	
+	ElseIf option == OIDBreasts
+		
+		SetSliderDialogStartValue(Breasts)
+		SetSliderDialogDefaultValue(BreastsDefault)
+		SetSliderDialogRange(0, 1)
+		SetSliderDialogInterval(0.1)
+		
 	ElseIf option == OIDBreastsSH
 		
 		SetSliderDialogStartValue(BreastsSH)
@@ -823,6 +854,13 @@ Event OnOptionSliderOpen(int option)
 		
 		SetSliderDialogStartValue(DoubleMelon)
 		SetSliderDialogDefaultValue(DoubleMelonDefault)
+		SetSliderDialogRange(0, 1)
+		SetSliderDialogInterval(0.1)
+		
+	ElseIf option == OIDBreastsFantasy
+		
+		SetSliderDialogStartValue(BreastsFantasy)
+		SetSliderDialogDefaultValue(BreastsFantasyDefault)
 		SetSliderDialogRange(0, 1)
 		SetSliderDialogInterval(0.1)
 		
