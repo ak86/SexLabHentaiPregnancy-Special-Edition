@@ -351,7 +351,7 @@ Event OnPageReset(string page)
 
 				AddTextOption("$HP_MCM_PregnancyMilk", "", OPTION_FLAG_DISABLED)
 				OIDDoubleMelon = AddSliderOption("$HP_MCM_DoubleMelon", DoubleMelon, "{2}")
-				OIDDoubleMelon = AddSliderOption("$HP_MCM_BreastsFantasy", BreastsFantasy, "{2}")
+				OIDBreastsFantasy = AddSliderOption("$HP_MCM_BreastsFantasy", BreastsFantasy, "{2}")
 				OIDNipplePerkiness = AddSliderOption("$HP_MCM_NipplePerkiness", NipplePerkiness, "{2}")
 				OIDNippleLength = AddSliderOption("$HP_MCM_NippleLength", NippleLength, "{2}")
 				AddEmptyOption()
