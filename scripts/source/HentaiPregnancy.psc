@@ -595,7 +595,7 @@ bool function has_keyword(actor a, int id, string filename)
 	return a.HasKeyword(kw)
 endfunction
 
-bool function setPregnant(Actor father, Actor mother, bool isvictim, bool fertilised)
+bool function setPregnant(Actor father, Actor mother, bool isvictim, bool fertilised, bool isAnal = false)
 	bool ispregnant = false
 	spell sp
 	keyword kw
@@ -626,16 +626,15 @@ bool function setPregnant(Actor father, Actor mother, bool isvictim, bool fertil
 		endif
 
 	if (mother.GetLeveledActorBase().IsUnique() || config.AllowNonUnique)
-		;pregnancy doesnt exist or mother is cum inflation
-		;seed/re-seed her
-		if(isNotPregnant(mother)) || getMotherState(mother) == "CumInflated"
-			int actorIndex = canMotherInflate(mother)
-			if actorIndex == -1
-				actorIndex = getPregnancyReadyActorsIndex()
-			endif
+		;find filled alias slot
+		int actorIndex = canMotherInflate(mother)
+		if (actorIndex == -1)
+			;pregnancy doesnt exist
+			;find empty alias slot to fill
+			actorIndex = getPregnancyReadyActorsIndex()
 			;Debug.Notification("Pregnant slot availuable " + actorIndex)
 			if(actorIndex > -1)
-				;preg all, npc, pc
+				;slot found, fill slot - cuminflate/impregnate: all, npc, pc
 				if(config.PregnancyActorOption == 0 || PlayerRef != mother && config.PregnancyActorOption == 1 || PlayerRef == mother && config.PregnancyActorOption == 2)
 					HentaiPregnantActorAlias pregnancy = PregnantActors[actorIndex]
 					pregnancy.ForceRefTo(mother)
@@ -643,26 +642,40 @@ bool function setPregnant(Actor father, Actor mother, bool isvictim, bool fertil
 					pregnancy.setFatherIsCreature(father.HasKeyword( Game.GetFormFromFile(0x13795, "Skyrim.esm") as Keyword ) || father.HasKeyword( Game.GetFormFromFile(0x13798, "Skyrim.esm") as Keyword ))
 					pregnancy.setFertilised(fertilised)
 					pregnancy.setIsVictim(isvictim)
-					CumInflation(actorIndex, father)
+					;inflate
+					CumInflation(actorIndex, father, isAnal)
 					pregnancy.GoToState("Inseminated")
 					pregnancy.setId(actorIndex)
 					if(fertilised)
 						if config.EnableMessages
 							Debug.Notification(father.GetDisplayName() + Strings.ShowHentaiPregnancyStrings(1) + mother.GetDisplayName())
 						endif
-						SoulGemImpregnation(actorIndex, father)
+						;plant soul gem 
+						SoulGemImpregnation(actorIndex, father, isAnal)
 						ispregnant = true
 						SendModEvent("HentaiPregnancyImpregnation", actorIndex, pregnancy.getCurrentHour())
 					endIf
 				endIf
 			endIf
 		else
-			;plant soul gem if mother in pregnant state
 			if (fertilised)
-				SoulGemImpregnation(isMotherPregnant(mother), father)
+				HentaiPregnantActorAlias pregnancy = PregnantActors[actorIndex]
+				if !(pregnancy.isFertilised())
+					if config.EnableMessages
+						Debug.Notification(father.GetDisplayName() + Strings.ShowHentaiPregnancyStrings(1) + mother.GetDisplayName())
+					endif
+					;mother is not pregnant(cuminflating?), impregnate her
+					pregnancy.setFather(father)
+					pregnancy.setFatherIsCreature(father.HasKeyword( Game.GetFormFromFile(0x13795, "Skyrim.esm") as Keyword ) || father.HasKeyword( Game.GetFormFromFile(0x13798, "Skyrim.esm") as Keyword ))
+					pregnancy.setFertilised(fertilised)
+					pregnancy.setIsVictim(isvictim)
+				endIf
+				
+				;plant soul gem if mother in pregnant state
+				SoulGemImpregnation(actorIndex, father, isAnal)
 			endIf
 			;inflate
-			CumInflation(canMotherInflate(mother), father)
+			CumInflation(actorIndex, father, isAnal)
 		endIf
 		utility.wait(1.0)
 	endIf
@@ -670,14 +683,14 @@ bool function setPregnant(Actor father, Actor mother, bool isvictim, bool fertil
 	return ispregnant
 endFunction
 
-function SoulGemImpregnation(int pregnancyID = -1, actor father)
-	if config.SoulGemPregnancy && pregnancyID > -1
+function SoulGemImpregnation(int pregnancyID = -1, actor father, bool isAnal = false, bool showmessage = true)
+	if config.SoulGemPregnancy && pregnancyID > -1 && !isAnal
 		HentaiPregnantActorAlias pregnancy = getPregnancyWithID(pregnancyID)
 		Actor mother = pregnancy.getMother()
 		;bool forced = pregnancy.isVictim()
 		;if father != mother 			self/estrus
 			if ((father.HasKeyword( Game.GetFormFromFile(0x13795, "Skyrim.esm") as Keyword ) || father.HasKeyword( Game.GetFormFromFile(0x13798, "Skyrim.esm") as Keyword )) || !config.CreaturesOnly)
-				if config.EnableMessages
+				if config.EnableMessages && showmessage
 					Debug.Notification(father.GetDisplayName() + Strings.ShowHentaiPregnancyStrings(3) + mother.GetDisplayName())
 				EndIf
 				pregnancy.setSoulGemCount( pregnancy.getSoulGemCount() + 1)
@@ -686,25 +699,44 @@ function SoulGemImpregnation(int pregnancyID = -1, actor father)
 	endIf
 endFunction
 
-function CumInflation(int pregnancyID = -1, actor father)
-		;Debug.Notification("CumInflation " + pregnancyID)
-	if config.CumInflation && pregnancyID > -1 && father != none
+function CumInflation(int pregnancyID = -1, actor father, bool isAnal = false)
+	;Debug.Notification("CumInflation " + pregnancyID)
+	if config.CumInflation && pregnancyID > -1 && father != none && !isAnal  ; anal wip, maybe someday finish it?
 		HentaiPregnantActorAlias pregnancy = getPregnancyWithID(pregnancyID)
 		Actor mother = pregnancy.getMother()
-		float AddCum = config.CumSizeBase
-;		Debug.Notification("cum to add " + AddCum)
-		AddCum = config.CumSizeBase * (1 + Utility.RandomFloat(-1*config.CumSizeRandomizer, config.CumSizeRandomizer)/100)
-;		Debug.Notification("cum to add randomized " + AddCum)
-		if (father.HasKeyword( Game.GetFormFromFile(0x13795, "Skyrim.esm") as Keyword ) || father.HasKeyword( Game.GetFormFromFile(0x13798, "Skyrim.esm") as Keyword ))
-			AddCum = AddCum * config.CumSizeCreatureModifier
-;			Debug.Notification("creature cum to add " + AddCum)
+		float AddCum
+		string File = "/HentaiPregnancy/MCMOverride.json"
+		string malekeyname = father.GetLeveledActorBase().GetRace().GetFormID()
+		int cum1 = JsonUtil.IntListGet(File, malekeyname, 0)
+		int cum2 = JsonUtil.IntListGet(File, malekeyname, 1)
+		
+		if (cum1 > 0)
+			AddCum = cum1
+		else
+			AddCum = config.CumSizeBase
+		endif
+;		Debug.Notification("AddCum(base) " + AddCum)
+
+		if (cum2 > 0)
+			AddCum *= (1 + Utility.RandomFloat(-1*cum2, cum2)/100)
+		else
+			AddCum *= (1 + Utility.RandomFloat(-1*config.CumSizeRandomizer, config.CumSizeRandomizer)/100)
+		endif
+;		Debug.Notification("AddCum(randomized) " + AddCum)
+		
+		if (cum1 <= 0)
+			if (father.HasKeyword( Game.GetFormFromFile(0x13795, "Skyrim.esm") as Keyword ) || father.HasKeyword( Game.GetFormFromFile(0x13798, "Skyrim.esm") as Keyword ))
+				AddCum *= config.CumSizeCreatureModifier
+;				Debug.Notification("creature cum to add " + AddCum)
+			endIf
 		endIf
+		
 		if father == mother
-			AddCum = AddCum * config.CumSizeEstrusModifier
+			AddCum *= config.CumSizeEstrusModifier
 ;			Debug.Notification("Estrus? " + AddCum)
 		endIf
 ;		Debug.Notification("final cum1 " + pregnancy.getCumInflation())
-		pregnancy.setCumInflation(pregnancy.getCumInflation() + AddCum)
+		pregnancy.setCumInflation(pregnancy.getCumInflation() + AddCum, isAnal)
 ;		Debug.Notification("final cum2 " + pregnancy.getCumInflation())
 	endIf
 endFunction
@@ -973,6 +1005,7 @@ Event HentaiPregnancyImpregnate(string eventName, string argString, float argNum
 	Actor[] actorList = SexLab.HookActors(argString)
 	sslThreadController controller = SexLab.HookController(argString)
 	sslBaseAnimation anim = SexLab.HookAnimation(argString)
+	string File = "/HentaiPregnancy/MCMOverride.json"
 	
 	;impregnate if:
 	;-more than 1 actor
@@ -990,22 +1023,43 @@ Event HentaiPregnancyImpregnate(string eventName, string argString, float argNum
 			i += 1
 		endWhile
 		
-		;int random = Utility.RandomInt(0, 100)
 		;Caster.GetFactionRank(HentaiFertilityFaction) > 0
-		int random = Utility.RandomInt(0, 100)
+		int random = Utility.RandomInt(1, 100)
 		int chance = -1
 		Actor victim = SexLab.HookVictim(argString)
-
+		bool isAnal = false
+		
 		if (MaleIndex >= 0 && FemaleIndex >= 0)
-			if(anim.HasTag("Creature") || anim.HasTag("Vaginal") || (anim.HasTag("Anal") && config.AllowAnal))
-				chance = config.PregnancyChance + StorageUtil.GetIntValue(actorList[FemaleIndex], "hp_fetility_modifier", 0)
+			string malekeyname = actorList[MaleIndex].GetLeveledActorBase().GetRace().GetFormID()
+			string femalekeyname = actorList[FemaleIndex].GetLeveledActorBase().GetRace().GetFormID()
+			;make/add new race
+			;JsonUtil.IntListInsertAt(File, malekeyname, 0, -1)
+			;JsonUtil.IntListInsertAt(File, malekeyname, 1, -1)
+			;JsonUtil.IntListInsertAt(File, malekeyname, 2, -1)
+			;JsonUtil.IntListInsertAt(File, malekeyname, 3, -1)
+			;JsonUtil.Save(File)
+			if (anim.HasTag("Vaginal"))
+				chance = (JsonUtil.IntListGet(File, malekeyname, 2) + JsonUtil.IntListGet(File, femalekeyname, 3)) / 2
+				;sexlab.log("chance " + chance)
+				if (chance == 0)
+					chance = config.PregnancyChance
+				endif
+				chance += StorageUtil.GetIntValue(actorList[FemaleIndex], "hp_fetility_modifier", 0)
+			endif
+			if (anim.HasTag("Anal") && config.AllowAnal)
+				isAnal = true
+				chance = (JsonUtil.IntListGet(File, malekeyname, 2) + JsonUtil.IntListGet(File, femalekeyname, 3)) / 2
+				if (chance == 0)
+					chance = config.PregnancyChance
+				endif
+				chance += StorageUtil.GetIntValue(actorList[FemaleIndex], "hp_fetility_modifier", 0)
 			endIf
-			setPregnant(actorList[MaleIndex], actorList[FemaleIndex], victim != none, random <= chance)
+			setPregnant(actorList[MaleIndex], actorList[FemaleIndex], victim != none, random <= chance, isAnal)
 		else
 			;Debug.Notification("could not find male ")
 		endIf
 	elseif anim.HasTag("Estrus")
-		setPregnant(actorList[0], actorList[0], true, false)
+		setPregnant(actorList[0], actorList[0], true, false, false)
 		;Debug.Notification("actorList.Length <=1 ")
 	endIf
 EndEvent
@@ -1016,6 +1070,7 @@ Event HentaiPregnancyImpregnateS(Form ActorRef, Int Thread)
 	Actor[] actorList = SexLab.HookActors(id)
 	sslThreadController controller = SexLab.HookController(id)
 	sslBaseAnimation anim = SexLab.HookAnimation(id)
+	string File = "/HentaiPregnancy/MCMOverride.json"
 	
 	;impregnate if:
 	;-more than 1 actor and
@@ -1034,21 +1089,36 @@ Event HentaiPregnancyImpregnateS(Form ActorRef, Int Thread)
 			i += 1
 		endWhile
 		
-		int random = Utility.RandomInt(0, 100)
+		int random = Utility.RandomInt(1, 100)
 		int chance = -1
 		;int chance = akActor.GetFactionRank(HentaiFertilityFaction)
 		Actor victim = SexLab.HookVictim(id)
+		bool isAnal = false
 
 		if (MaleIndex >= 0 && FemaleIndex >= 0)
-			if(anim.HasTag("Creature") || anim.HasTag("Vaginal") || (anim.HasTag("Anal") && config.AllowAnal))
-				chance = config.PregnancyChance + StorageUtil.GetIntValue(actorList[FemaleIndex], "hp_fetility_modifier", 0)
+			string malekeyname = actorList[MaleIndex].GetLeveledActorBase().GetRace().GetFormID()
+			string femalekeyname = actorList[FemaleIndex].GetLeveledActorBase().GetRace().GetFormID()
+			if (anim.HasTag("Vaginal"))
+				chance = (JsonUtil.IntListGet(File, malekeyname, 2) + JsonUtil.IntListGet(File, femalekeyname, 3)) / 2
+				if (chance == 0 )
+					chance = config.PregnancyChance
+				endif
+				chance += StorageUtil.GetIntValue(actorList[FemaleIndex], "hp_fetility_modifier", 0)
+			endif
+			if (anim.HasTag("Anal") && config.AllowAnal)
+				isAnal = true
+				chance = (JsonUtil.IntListGet(File, malekeyname, 2) + JsonUtil.IntListGet(File, femalekeyname, 3)) / 2
+				if (chance == 0 )
+					chance = config.PregnancyChance
+				endif
+				chance += StorageUtil.GetIntValue(actorList[FemaleIndex], "hp_fetility_modifier", 0)
 			endIf
-			setPregnant(actorList[MaleIndex], actorList[FemaleIndex], victim != none, random <= chance)
+			setPregnant(actorList[MaleIndex], actorList[FemaleIndex], victim != none, random <= chance, isAnal)
 		else
 			;Debug.Notification("could not find male ")
 		endIf
 	elseif anim.HasTag("Estrus")
-		setPregnant(actorList[0], actorList[0], true, false)
+		setPregnant(actorList[0], actorList[0], true, false, false)
 		;Debug.Notification("actorList.Length <=1 ")
 	endIf
 EndEvent

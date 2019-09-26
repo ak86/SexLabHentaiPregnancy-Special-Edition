@@ -1,0 +1,11 @@
+{
+	"intList" : 
+	{
+		"1value=cum_basevalue(ml),0orless=use_mcm_value" : [ 0, 0, 0, 0 ],
+		"2value=cum_persentagerandomizer(%),0orless=use_mcm_value" : [ 0, 0, 0, 0 ],
+		"3value=malefertility(%),0=use_mcm_value" : [ 0, 0, 0, 0 ],
+		"4value=femalefertility(%),0=use_mcm_value" : [ 0, 0, 0, 0 ],
+		"pregnancychance=(malefertility+femalefertility)/2" : [ 0, 0, 0, 0 ],
+		"79688(RedguardRace(hex=>dec))" : [ 15, 50, 15, 15 ]
+	}
+}

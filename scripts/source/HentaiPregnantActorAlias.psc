@@ -33,6 +33,7 @@ float TargetBodyWeight = 0.0
 
 float lastGameTime = 0.0
 float CumInflation = 0.0
+float CumInflationAnal = 0.0
 
 bool isvictim = false
 bool fertilised = false
@@ -57,6 +58,7 @@ auto State ReadyForPregnancy
 		FatherRef = none
 		lastGameTime = 0.0
 		CumInflation = 0.0
+		CumInflationAnal = 0.0
 		isvictim = false
 		fertilised = false
 		FatherIsCreature = false
@@ -158,12 +160,15 @@ int function setMilk(int i)
 endFunction
 
 float function getCumInflation()
-	return CumInflation
+	return CumInflation + CumInflationAnal
 endFunction
 
-float function setCumInflation(float i)
+float function setCumInflation(float i, bool isAnal = false)
 	if (CumInflation + i ) / 1000 <= HentaiP.config.CumBellySizeMax * (1 + Utility.RandomFloat(-1*HentaiP.config.CumBellySizeMaxRandomizer, HentaiP.config.CumBellySizeMaxRandomizer)/100)
 		CumInflation = i
+		if (isAnal)
+			CumInflationAnal = i
+		endif
 	else
 		CumInflation = HentaiP.config.CumBellySizeMax * (1 + Utility.RandomFloat(-1*HentaiP.config.CumBellySizeMaxRandomizer, HentaiP.config.CumBellySizeMaxRandomizer)/100) * 1000
 		if HentaiP.config.EnableMessages && (ActorRef == HentaiP.PlayerRef || HentaiP.PlayerRef.GetDistance(ActorRef) < 500)
@@ -225,6 +230,11 @@ function updateSizeBreast()
 	if BreastScaling
 		float MilkBreastSize = ((TargetBreastSize-CurrentBreastSize) / TargetBreastSize) * Milk
 		float FinalBreastSize = CurrentBreastSize + MilkBreastSize
+		;HentaiP.sexlab.log(ActorRef.GetLeveledActorBase().GetName() + " CurrentBreastSize " + CurrentBreastSize)
+		;HentaiP.sexlab.log(ActorRef.GetLeveledActorBase().GetName() + " TargetBreastSize " + TargetBreastSize)
+		;HentaiP.sexlab.log(ActorRef.GetLeveledActorBase().GetName() + " Milk " + Milk)
+		;HentaiP.sexlab.log(ActorRef.GetLeveledActorBase().GetName() + " MilkBreastSize1 " + MilkBreastSize)
+		;HentaiP.sexlab.log(ActorRef.GetLeveledActorBase().GetName() + " MilkBreastSize2 " + FinalBreastSize)
 		;fix final Breast
 		if FinalBreastSize > HentaiP.config.MaxScaleBreasts
 			FinalBreastSize = HentaiP.config.MaxScaleBreasts
@@ -425,11 +435,8 @@ State Inseminated
 
 		PregDurationCalc()
 		targetSizeCalc()
+		recheckBody()
 	
-		;old cuminflation
-		;int random = Utility.RandomInt(0, 100)
-		;int chance = HentaiP.config.CumInflationChance
-		;if random <= chance && (!HentaiP.config.CumInflationCreaturesOnly || (HentaiP.config.CumInflationCreaturesOnly && FatherIsCreature))
 		if fertilised
 			GoToState("Pregnant")
 		elseif CumInflation > 0
@@ -454,6 +461,8 @@ State CumInflated
 			GetActorRef().SetFactionRank(HentaiP.HentaiPregnantFaction, 1)
 		endif
 		TargetBellySize = HentaiP.config.CumBellySizeMax * (1 + Utility.RandomFloat(-1*HentaiP.config.CumBellySizeMaxRandomizer, HentaiP.config.CumBellySizeMaxRandomizer)/100)
+		recheckBody()
+		
 		RegisterForSingleUpdateGameTime(1)
 	EndEvent
 	
@@ -461,6 +470,16 @@ State CumInflated
 		if !fertilised && CumInflation > 0
 			;leak out/ absorb cum
 			CumInflation -= HentaiP.config.CumAbsorb
+			CumInflationAnal -= HentaiP.config.CumAbsorb
+			if (CumInflationAnal < 0)
+				CumInflationAnal = 0
+			endif
+			;int random = Utility.RandomInt(0, 100)
+			;int pregchance = (CumInflation - CumInflationAnal ) / 1000 <= HentaiP.config.CumBellySizeMax * (1 + Utility.RandomFloat(-1*HentaiP.config.CumBellySizeMaxRandomizer, HentaiP.config.CumBellySizeMaxRandomizer)/100)
+			;if (random <= chance)
+			;	fertilised = true
+			;	SoulGemImpregnation(pregnancyId, father, false, false)
+			;endif
 			updateSizeBelly()
 			RegisterForSingleUpdateGameTime(1)
 		else
@@ -499,7 +518,8 @@ State Pregnant
 		PregDurationCalc()
 		targetSizeCalc()
 		lastGameTime = Utility.GetCurrentGameTime()
-
+		recheckBody()
+		
 		RegisterForSingleUpdateGameTime(1)
 	EndEvent
 	
@@ -518,6 +538,10 @@ State Pregnant
 			CurrentHour += hourspassed
 			While hourspassed > 0
 				CumInflation -= HentaiP.config.CumAbsorb
+				CumInflationAnal -= HentaiP.config.CumAbsorb
+				if (CumInflationAnal < 0)
+					CumInflationAnal = 0
+				endif
 				incrSizeBreast()
 				incrSizeBelly()
 				incrWeight()
@@ -665,6 +689,10 @@ State PostPregnancy
 			CurrentHour += hourspassed
 			While hourspassed > 0
 				CumInflation -= HentaiP.config.CumAbsorb
+				CumInflationAnal -= HentaiP.config.CumAbsorb
+				if (CumInflationAnal < 0)
+					CumInflationAnal = 0
+				endif
 				decrWeight()
 				decrSizeBreast()
 				updateSizeBelly()

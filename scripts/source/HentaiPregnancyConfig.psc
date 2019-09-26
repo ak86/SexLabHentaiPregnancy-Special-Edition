@@ -346,7 +346,7 @@ Event OnPageReset(string page)
 				OIDChubbyButt = AddSliderOption("$HP_MCM_ChubbyButt", ChubbyButt, "{2}")
 				OIDChubbyLegs = AddSliderOption("$HP_MCM_ChubbyLegs", ChubbyLegs, "{2}")
 				OIDButtShape2 = AddSliderOption("$HP_MCM_ButtShape2", ButtShape2, "{2}")
-				OIDPregnancyBelly = AddSliderOption("$HP_MCM_PregnancyBelly", PregnancyBelly, "{2}")
+				OIDPregnancyBelly = AddSliderOption("$HP_MCM_PregnancyBelly_node", PregnancyBelly, "{2}")
 				AddEmptyOption()
 
 				AddTextOption("$HP_MCM_PregnancyMilk", "", OPTION_FLAG_DISABLED)
@@ -382,8 +382,8 @@ Event OnPageReset(string page)
 			OIDCumInflation = AddToggleOption("$HP_MCM_CumInflation", CumInflation)
 			OIDCumSizeBase = AddSliderOption("$HP_MCM_CumSizeBase", CumSizeBase, "{0}")
 			OIDCumSizeRandomizer = AddSliderOption("$HP_MCM_CumSizeRandomizer", CumSizeRandomizer, "{0}%")
-			OIDCumSizeCreatureModifier = AddSliderOption("$HP_MCM_CumSizeCreatureModifier", CumSizeCreatureModifier, "{0}")
-			OIDCumSizeEstrusModifier = AddSliderOption("$HP_MCM_CumSizeEstrusModifier", CumSizeEstrusModifier, "{0}")
+			OIDCumSizeCreatureModifier = AddSliderOption("$HP_MCM_CumSizeCreatureModifier", CumSizeCreatureModifier, "{1}")
+			OIDCumSizeEstrusModifier = AddSliderOption("$HP_MCM_CumSizeEstrusModifier", CumSizeEstrusModifier, "{1}")
 			OIDCumAbsorb = AddSliderOption("$HP_MCM_CumAbsorb", CumAbsorb, "{0}")
 			OIDCumDrain = AddSliderOption("$HP_MCM_CumDrain", CumDrain, "{0}")
 
@@ -520,12 +520,12 @@ Event OnOptionSliderAccept(int option, float floatValue)
 		
 	ElseIf option == OIDCumSizeCreatureModifier
 		
-		SetSliderOptionValue(option, floatValue, "{0}")
+		SetSliderOptionValue(option, floatValue, "{1}")
 		CumSizeCreatureModifier = value
 		
 	ElseIf option == OIDCumSizeEstrusModifier
 		
-		SetSliderOptionValue(option, floatValue, "{0}")
+		SetSliderOptionValue(option, floatValue, "{1}")
 		CumSizeEstrusModifier = value
 		
 	ElseIf option == OIDCumAbsorb
@@ -750,14 +750,14 @@ Event OnOptionSliderOpen(int option)
 		SetSliderDialogStartValue(CumSizeCreatureModifier)
 		SetSliderDialogDefaultValue(CumSizeCreatureModifierDefault)
 		SetSliderDialogRange(1, 100)
-		SetSliderDialogInterval(1)	
+		SetSliderDialogInterval(0.1)	
 		
 	ElseIf option == OIDCumSizeEstrusModifier
 		
 		SetSliderDialogStartValue(CumSizeEstrusModifier)
 		SetSliderDialogDefaultValue(CumSizeEstrusModifierDefault)
 		SetSliderDialogRange(1, 1000)
-		SetSliderDialogInterval(1)	
+		SetSliderDialogInterval(0.1)	
 		
 	ElseIf option == OIDCumAbsorb
 		
