@@ -570,6 +570,7 @@ function ResetBody(Actor ActorRef)
 		ModEvent.PushString(SLIF_unregisterActor, "SexLab Hentai Pregnancy")
 		ModEvent.Send(SLIF_unregisterActor)
 	endif
+	HentaiPregnancy_Slavetats.slhp_remove_tattoo(ActorRef)
 endFunction
 
 form function get_form(int id, string filename)

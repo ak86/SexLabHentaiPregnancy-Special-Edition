@@ -42,6 +42,8 @@ bool BreastScaling = true
 bool BellyScaling = true
 bool BodyWeightScaling = true
 
+string tattoo = ""
+
 Event OnInit()
 	GoToState("ReadyForPregnancy")
 EndEvent
@@ -197,6 +199,9 @@ int function setSoulGemCount(int i)
 	endIf
 	if SoulGemCount < 0
 		SoulGemCount = 0
+	endif
+	if (i > 0)
+		ApplyTat()
 	endif
 	setSoulGemStartHour()
 	return SoulGemCount
@@ -361,6 +366,33 @@ function recheckBody()
 	updateSizeBelly()
 	updateSizeBreast()
 	updateWeight(CurrentBodyWeight)
+	
+	ApplyTat()
+endFunction
+
+function ApplyTat()
+	string newtattoo = ""
+	if (ActorRef.GetFactionRank(HentaiP.HentaiPregnantFaction) >= 0)
+		if (ActorRef.GetFactionRank(HentaiP.HentaiPregnantFaction) > 1)
+			if (SoulGemCount > 0)
+				newtattoo = "soulgempregnancy"
+			else
+				newtattoo = "normalpregnancy"
+			endif
+		elseif (ActorRef.GetFactionRank(HentaiP.HentaiPregnantFaction) == 1)
+			newtattoo = "empty"
+		endif
+		
+		if (newtattoo != "")
+			if (tattoo != newtattoo)
+				HentaiPregnancy_Slavetats.slhp_remove_tattoo(ActorRef)
+				tattoo = newtattoo
+				HentaiPregnancy_Slavetats.slhp_add_tattoo(ActorRef, tattoo)
+			endif
+		endif
+	else
+		HentaiPregnancy_Slavetats.slhp_remove_tattoo(ActorRef)
+	endif
 endFunction
 
 bool function PregDurationCalc()
@@ -461,8 +493,11 @@ State CumInflated
 			GetActorRef().SetFactionRank(HentaiP.HentaiPregnantFaction, 1)
 		endif
 		TargetBellySize = HentaiP.config.CumBellySizeMax * (1 + Utility.RandomFloat(-1*HentaiP.config.CumBellySizeMaxRandomizer, HentaiP.config.CumBellySizeMaxRandomizer)/100)
+
 		recheckBody()
 		
+		ApplyTat()
+
 		RegisterForSingleUpdateGameTime(1)
 	EndEvent
 	
@@ -519,6 +554,8 @@ State Pregnant
 		targetSizeCalc()
 		lastGameTime = Utility.GetCurrentGameTime()
 		recheckBody()
+		
+		ApplyTat()
 		
 		RegisterForSingleUpdateGameTime(1)
 	EndEvent
@@ -670,6 +707,9 @@ State PostPregnancy
 		;multiplying by 6 gives roughly the correct delta for returning to the original weight
 		
 		lastGameTime = Utility.GetCurrentGameTime()
+
+		ActorRef.SetFactionRank(HentaiP.HentaiPregnantFaction, 1)
+		ApplyTat()
 		
 		RegisterForSingleUpdateGameTime(1)
 	EndEvent
