@@ -419,6 +419,11 @@ endFunction
 
 function setBreastScaling(bool value = true)
 	;Skeleton check	
+	if HentaiP.config.ScalingCheckOverride
+		value = true
+		BreastScaling = value
+		return
+	endIf
 	if !NetImmerse.HasNode(ActorRef, "NPC L Breast", false)
 		Debug.Notification("HP:" + ActorRef.GetLeveledActorBase().GetName() + HentaiP.Strings.ShowHentaiPregnancyStrings(5))
 		value = false
@@ -436,6 +441,11 @@ endFunction
 
 function setBellyScaling(bool value = true)
 	;Skeleton check	
+	if HentaiP.config.ScalingCheckOverride
+		value = true
+		BellyScaling = value
+		return
+	endIf
 	if !NetImmerse.HasNode(ActorRef, "NPC Belly", false)
 		Debug.Notification("HP:" + ActorRef.GetLeveledActorBase().GetName() + HentaiP.Strings.ShowHentaiPregnancyStrings(7))
 		value = false

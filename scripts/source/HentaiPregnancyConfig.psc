@@ -43,6 +43,10 @@ bool Property BellyScaling = false Auto Hidden
 int OIDBodyWeightScaling
 bool Property BodyWeightScaling = false Auto Hidden
 
+;override node check, for smp which has no nodes
+int OIDScalingCheckOverride
+bool Property ScalingCheckOverride = false Auto Hidden
+
 ;morph scaling
 ;pregnancy breast
 int OIDBreasts
@@ -325,12 +329,15 @@ Event OnPageReset(string page)
 
 				OIDBreastScaling = AddToggleOption("$HP_MCM_BreastScaling", BreastScaling)
 				OIDMaxScaleBreasts = AddSliderOption("$HP_MCM_MaxScaleBreasts", MaxScaleBreasts, "{1}")
+				
 				OIDBodyWeightScaling = AddToggleOption("$HP_MCM_BodyWeightScaling", BodyWeightScaling)
 				OIDMaxScaleBodyWeight = AddSliderOption("$HP_MCM_MaxScaleBodyWeight", MaxScaleBodyWeight, "{1}")
+				
 				AddEmptyOption()
 
 			AddHeaderOption("$HP_MCM_BodyMorphingHeader")
 
+				OIDScalingCheckOverride = AddToggleOption("$HP_MCM_ScalingCheckOverride", ScalingCheckOverride)
 				AddTextOption("0=0%, 1=100%", "", OPTION_FLAG_DISABLED)
 				AddTextOption("$HP_MCM_PregnancyBreast", "", OPTION_FLAG_DISABLED)
 				OIDBreasts = AddSliderOption("$HP_MCM_Breasts", Breasts, "{2}")
@@ -1028,6 +1035,13 @@ event OnOptionSelect(int option)
 		SetToggleOptionValue(OIDBodyWeightScaling, BodyWeightScaling)
 		hentaiPregnancyQuest.UpdateBodyWeightScaling()
 		
+	elseIf option == OIDScalingCheckOverride
+	
+		ScalingCheckOverride = !ScalingCheckOverride
+		SetToggleOptionValue(OIDScalingCheckOverride, ScalingCheckOverride)
+		hentaiPregnancyQuest.UpdateBreastScaling()
+		hentaiPregnancyQuest.UpdateBellyScaling()
+		
 	elseIf option == OIDResetScaling
 	
 		ResetScaling = !ResetScaling
@@ -1222,6 +1236,9 @@ Event OnOptionHighlight(int option)
 		
 	ElseIf option == OIDBodyWeightScaling
 		SetInfoText("$HP_MCM_BodyWeightScalingDescription")
+    
+	ElseIf option == OIDScalingCheckOverride
+		SetInfoText("$HP_MCM_ScalingCheckOverrideDescription")
     
 	ElseIf option == OIDPCMilking
 		SetInfoText("$HP_MCM_PCMilkingDescription")
