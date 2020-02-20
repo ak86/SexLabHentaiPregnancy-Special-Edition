@@ -1015,11 +1015,12 @@ Event HentaiPregnancyImpregnate(string eventName, string argString, float argNum
 		int MaleIndex = -1
 		int FemaleIndex = -1
 		int i = 0
+		if FemaleIndex == -1 && (actorList[0].GetLeveledActorBase().GetSex() == 1 || (anim.HasTag("Anal") && config.AllowAnal))
+			FemaleIndex = 0
+		endIf
 		while (i < actorList.Length)
 			if SexLab.GetGender(actorList[i])== 0 || treatAsMale(actorList[i], controller, anim)
 				MaleIndex = i
-			elseif FemaleIndex == -1 && (actorList[i].GetLeveledActorBase().GetSex() == 1 || (anim.HasTag("Anal") && config.AllowAnal))
-				FemaleIndex = i			
 			endIf
 			i += 1
 		endWhile
@@ -1081,11 +1082,12 @@ Event HentaiPregnancyImpregnateS(Form ActorRef, Int Thread)
 		int MaleIndex = -1
 		int FemaleIndex = -1
 		int i = 0
+		if FemaleIndex == -1 && (actorList[0].GetLeveledActorBase().GetSex() == 1 || (anim.HasTag("Anal") && config.AllowAnal))
+			FemaleIndex = 0
+		endIf
 		while (i < actorList.Length)
 			if SexLab.GetGender(actorList[i])== 0 || treatAsMale(actorList[i], controller, anim)
 				MaleIndex = i
-			elseif FemaleIndex == -1 && (actorList[i].GetLeveledActorBase().GetSex() == 1 || (anim.HasTag("Anal") && config.AllowAnal))
-				FemaleIndex = i			
 			endIf
 			i += 1
 		endWhile
