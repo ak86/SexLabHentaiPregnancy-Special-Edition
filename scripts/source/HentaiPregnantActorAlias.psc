@@ -166,7 +166,7 @@ float function getCumInflation()
 endFunction
 
 float function setCumInflation(float i, bool isAnal = false)
-	if (CumInflation + i ) / 1000 <= HentaiP.config.CumBellySizeMax * (1 + Utility.RandomFloat(-1*HentaiP.config.CumBellySizeMaxRandomizer, HentaiP.config.CumBellySizeMaxRandomizer)/100)
+	if (i) / 1000 <= HentaiP.config.CumBellySizeMax * (1 + Utility.RandomFloat(-1*HentaiP.config.CumBellySizeMaxRandomizer, HentaiP.config.CumBellySizeMaxRandomizer)/100)
 		CumInflation = i
 		if (isAnal)
 			CumInflationAnal = i
