@@ -764,6 +764,9 @@ endFunction
 
 form function getSoulGemSize(int pregnancyID)
 	HentaiPregnantActorAlias pregnancy = getPregnancyWithID(pregnancyID)
+	if pregnancy.getSoulGemCount() == 0
+		return none
+	endif
 	float soulGemSize = (pregnancy.getCurrentHour() - pregnancy.getSoulGemStartHour()) / (config.SoulGemDuration * pregnancy.getSoulGemCount())
 	If soulGemSize >= 4 && !pregnancy.getFatherIsCreature()
 		return SoulGemBlackFilled
@@ -1003,63 +1006,15 @@ Event OnSexLabStart(String _eventName, String _args, Float _argc, Form _sender)
 EndEvent
 
 Event HentaiPregnancyImpregnate(string eventName, string argString, float argNum, form sender)
+	Actor akActor = none
 	Actor[] actorList = SexLab.HookActors(argString)
 	sslThreadController controller = SexLab.HookController(argString)
 	sslBaseAnimation anim = SexLab.HookAnimation(argString)
-	string File = "/HentaiPregnancy/MCMOverride.json"
 	
 	;impregnate if:
 	;-more than 1 actor
 	if actorList.Length > 1 && (anim.HasTag("Vaginal") || (anim.HasTag("Anal")))
-
-		int MaleIndex = -1
-		int FemaleIndex = -1
-		int i = 0
-		if FemaleIndex == -1 && (actorList[0].GetLeveledActorBase().GetSex() == 1 || (anim.HasTag("Anal") && config.AllowAnal))
-			FemaleIndex = 0
-		endIf
-		while (i < actorList.Length)
-			if SexLab.GetGender(actorList[i])== 0 || treatAsMale(actorList[i], controller, anim)
-				MaleIndex = i
-			endIf
-			i += 1
-		endWhile
-		
-		;Caster.GetFactionRank(HentaiFertilityFaction) > 0
-		int random = Utility.RandomInt(1, 100)
-		int chance = -1
-		Actor victim = SexLab.HookVictim(argString)
-		bool isAnal = false
-		
-		if (MaleIndex >= 0 && FemaleIndex >= 0)
-			string malekeyname = actorList[MaleIndex].GetLeveledActorBase().GetRace().GetFormID()
-			string femalekeyname = actorList[FemaleIndex].GetLeveledActorBase().GetRace().GetFormID()
-			;make/add new race
-			;JsonUtil.IntListInsertAt(File, malekeyname, 0, -1)
-			;JsonUtil.IntListInsertAt(File, malekeyname, 1, -1)
-			;JsonUtil.IntListInsertAt(File, malekeyname, 2, -1)
-			;JsonUtil.IntListInsertAt(File, malekeyname, 3, -1)
-			;JsonUtil.Save(File)
-			if (anim.HasTag("Vaginal"))
-				chance = (JsonUtil.IntListGet(File, malekeyname, 2) + JsonUtil.IntListGet(File, femalekeyname, 3)) / 2
-				;sexlab.log("chance " + chance)
-				if (chance == 0)
-					chance = config.PregnancyChance
-				endif
-				chance += StorageUtil.GetIntValue(actorList[FemaleIndex], "hp_fetility_modifier", 0)
-			endif
-			if (anim.HasTag("Anal") && config.AllowAnal)
-				isAnal = true
-				chance = (JsonUtil.IntListGet(File, malekeyname, 2) + JsonUtil.IntListGet(File, femalekeyname, 3)) / 2
-				if (chance == 0)
-					chance = config.PregnancyChance
-				endif
-				chance += StorageUtil.GetIntValue(actorList[FemaleIndex], "hp_fetility_modifier", 0)
-			endIf
-			setPregnant(actorList[MaleIndex], actorList[FemaleIndex], victim != none, random <= chance, isAnal)
-		else
-			;Debug.Notification("could not find male ")
-		endIf
+		Impregnate(akActor, actorList, controller, anim)
 	elseif anim.HasTag("Estrus")
 		setPregnant(actorList[0], actorList[0], true, false, false)
 		;Debug.Notification("actorList.Length <=1 ")
@@ -1072,56 +1027,71 @@ Event HentaiPregnancyImpregnateS(Form ActorRef, Int Thread)
 	Actor[] actorList = SexLab.HookActors(id)
 	sslThreadController controller = SexLab.HookController(id)
 	sslBaseAnimation anim = SexLab.HookAnimation(id)
-	string File = "/HentaiPregnancy/MCMOverride.json"
 	
 	;impregnate if:
 	;-more than 1 actor and
 	;-orgasming actor not in recieving/female position (0)
 	if actorList.Length > 1 && akActor != actorList[0] && (anim.HasTag("Vaginal") || (anim.HasTag("Anal")))
-	
-		int MaleIndex = -1
-		int FemaleIndex = -1
-		int i = 0
-		if FemaleIndex == -1 && (actorList[0].GetLeveledActorBase().GetSex() == 1 || (anim.HasTag("Anal") && config.AllowAnal))
-			FemaleIndex = 0
-		endIf
-		while (i < actorList.Length)
-			if SexLab.GetGender(actorList[i])== 0 || treatAsMale(actorList[i], controller, anim)
-				MaleIndex = i
-			endIf
-			i += 1
-		endWhile
-		
-		int random = Utility.RandomInt(1, 100)
-		int chance = -1
-		;int chance = akActor.GetFactionRank(HentaiFertilityFaction)
-		Actor victim = SexLab.HookVictim(id)
-		bool isAnal = false
-
-		if (MaleIndex >= 0 && FemaleIndex >= 0)
-			string malekeyname = actorList[MaleIndex].GetLeveledActorBase().GetRace().GetFormID()
-			string femalekeyname = actorList[FemaleIndex].GetLeveledActorBase().GetRace().GetFormID()
-			if (anim.HasTag("Vaginal"))
-				chance = (JsonUtil.IntListGet(File, malekeyname, 2) + JsonUtil.IntListGet(File, femalekeyname, 3)) / 2
-				if (chance == 0 )
-					chance = config.PregnancyChance
-				endif
-				chance += StorageUtil.GetIntValue(actorList[FemaleIndex], "hp_fetility_modifier", 0)
-			endif
-			if (anim.HasTag("Anal") && config.AllowAnal)
-				isAnal = true
-				chance = (JsonUtil.IntListGet(File, malekeyname, 2) + JsonUtil.IntListGet(File, femalekeyname, 3)) / 2
-				if (chance == 0 )
-					chance = config.PregnancyChance
-				endif
-				chance += StorageUtil.GetIntValue(actorList[FemaleIndex], "hp_fetility_modifier", 0)
-			endIf
-			setPregnant(actorList[MaleIndex], actorList[FemaleIndex], victim != none, random <= chance, isAnal)
-		else
-			;Debug.Notification("could not find male ")
-		endIf
+		Impregnate(akActor, actorList, controller, anim)
 	elseif anim.HasTag("Estrus")
 		setPregnant(actorList[0], actorList[0], true, false, false)
 		;Debug.Notification("actorList.Length <=1 ")
 	endIf
 EndEvent
+
+function Impregnate(Actor akActor, Actor[] actorList, sslThreadController controller, sslBaseAnimation anim)
+	string File = "/HentaiPregnancy/MCMOverride.json"
+	
+	int MaleIndex = -1
+	int FemaleIndex = -1
+	int i = actorList.Length - 1
+	
+	if FemaleIndex == -1 && (actorList[0].GetLeveledActorBase().GetSex() == 1 || (anim.HasTag("Anal") && config.AllowAnal))
+		FemaleIndex = 0
+	endIf
+	
+	while (i >= 0 && MaleIndex == -1)
+		if SexLab.GetGender(actorList[i])== 0 || treatAsMale(actorList[i], controller, anim)
+			if akActor == none || akActor == actorList[i]
+				MaleIndex = i
+			endIf
+		endIf
+		i -= 1
+	endWhile
+	
+	;Caster.GetFactionRank(HentaiFertilityFaction) > 0
+	int random = Utility.RandomInt(1, 100)
+	int chance = -1
+	Actor victim = SexLab.HookVictim(actorList)
+	bool isAnal = false
+	
+	if (MaleIndex > 0 && FemaleIndex == 0)
+		string malekeyname = actorList[MaleIndex].GetLeveledActorBase().GetRace().GetFormID()
+		string femalekeyname = actorList[FemaleIndex].GetLeveledActorBase().GetRace().GetFormID()
+		;make/add new race
+		;JsonUtil.IntListInsertAt(File, malekeyname, 0, -1)
+		;JsonUtil.IntListInsertAt(File, malekeyname, 1, -1)
+		;JsonUtil.IntListInsertAt(File, malekeyname, 2, -1)
+		;JsonUtil.IntListInsertAt(File, malekeyname, 3, -1)
+		;JsonUtil.Save(File)
+		if (anim.HasTag("Vaginal"))
+			chance = (JsonUtil.IntListGet(File, malekeyname, 2) + JsonUtil.IntListGet(File, femalekeyname, 3)) / 2
+			;sexlab.log("chance " + chance)
+			if (chance == 0)
+				chance = config.PregnancyChance
+			endif
+			chance += StorageUtil.GetIntValue(actorList[FemaleIndex], "hp_fetility_modifier", 0)
+		endif
+		if (anim.HasTag("Anal") && config.AllowAnal)
+			isAnal = true
+			chance = (JsonUtil.IntListGet(File, malekeyname, 2) + JsonUtil.IntListGet(File, femalekeyname, 3)) / 2
+			if (chance == 0)
+				chance = config.PregnancyChance
+			endif
+			chance += StorageUtil.GetIntValue(actorList[FemaleIndex], "hp_fetility_modifier", 0)
+		endIf
+		setPregnant(actorList[MaleIndex], actorList[FemaleIndex], victim != none, random <= chance, isAnal)
+	else
+		;Debug.Notification("could not find male ")
+	endIf
+endFunction
