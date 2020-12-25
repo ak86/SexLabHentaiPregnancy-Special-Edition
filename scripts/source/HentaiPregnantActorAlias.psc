@@ -826,12 +826,27 @@ EndState
 event OnSit(ObjectReference akFurniture)
 	;machine milking
 	
-	Bool MMEZAZ1 = Game.GetFormFromFile(0x26D2E, "MilkModNew Zaz.esp")
-	Bool MMEZAZ2 = Game.GetFormFromFile(0x26D2E , "MilkModNew Zaz Sandbox.esp")
-	Bool MME1 = akFurniture.HasKeyword( Game.GetFormFromFile(0x7e3bc, "MilkModNew.esp") as Keyword )
-	Bool MME2 = akFurniture.HasKeyword( Game.GetFormFromFile(0x7e3bd, "MilkModNew.esp") as Keyword )
-	Bool ZAZ1 = akFurniture.HasKeyword( Game.GetFormFromFile(0x26D1B, "ZaZAnimationPack.esm") as Keyword )
-	Bool ZAZ2 = akFurniture.HasKeyword( Game.GetFormFromFile(0x26D17, "ZaZAnimationPack.esm") as Keyword )
+	Bool MMEZAZ1 = false
+	Bool MMEZAZ2 = false
+	Bool MME1 = false
+	Bool MME2 = false
+	Bool ZAZ1 = false
+	Bool ZAZ2 = false
+	
+	if Game.GetModbyName("MilkModNew Zaz.esp") != 255
+		MMEZAZ1 = Game.GetFormFromFile(0x26D2E, "MilkModNew Zaz.esp")
+	endif
+	if Game.GetModbyName("MilkModNew Zaz Sandbox.esp") != 255
+		MMEZAZ2 = Game.GetFormFromFile(0x26D2E , "MilkModNew Zaz Sandbox.esp")
+	endif
+	if Game.GetModbyName("MilkModNew.esp") != 255
+		MME1 = akFurniture.HasKeyword( Game.GetFormFromFile(0x7e3bc, "MilkModNew.esp") as Keyword )
+		MME2 = akFurniture.HasKeyword( Game.GetFormFromFile(0x7e3bd, "MilkModNew.esp") as Keyword )
+	endif
+	if Game.GetModbyName("ZaZAnimationPack.esm") != 255
+		ZAZ1 = akFurniture.HasKeyword( Game.GetFormFromFile(0x26D1B, "ZaZAnimationPack.esm") as Keyword )
+		ZAZ2 = akFurniture.HasKeyword( Game.GetFormFromFile(0x26D17, "ZaZAnimationPack.esm") as Keyword )
+	endif
 
 	Int Animationtoplay = 0
 	
