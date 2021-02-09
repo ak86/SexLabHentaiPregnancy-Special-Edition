@@ -826,105 +826,105 @@ Event OnOptionSliderOpen(int option)
 		
 		SetSliderDialogStartValue(Breasts)
 		SetSliderDialogDefaultValue(BreastsDefault)
-		SetSliderDialogRange(0, 1)
+		SetSliderDialogRange(0, 3)
 		SetSliderDialogInterval(0.1)
 		
 	ElseIf option == OIDBreastsSH
 		
 		SetSliderDialogStartValue(BreastsSH)
 		SetSliderDialogDefaultValue(BreastsSHDefault)
-		SetSliderDialogRange(0, 1)
+		SetSliderDialogRange(0, 3)
 		SetSliderDialogInterval(0.1)
 		
 	ElseIf option == OIDBreastsSSH
 		
 		SetSliderDialogStartValue(BreastsSSH)
 		SetSliderDialogDefaultValue(BreastsSSHDefault)
-		SetSliderDialogRange(0, 1)
+		SetSliderDialogRange(0, 3)
 		SetSliderDialogInterval(0.1)
 		
 	ElseIf option == OIDBreastGravity
 		
 		SetSliderDialogStartValue(BreastGravity)
 		SetSliderDialogDefaultValue(BreastGravityDefault)
-		SetSliderDialogRange(0, 1)
+		SetSliderDialogRange(0, 3)
 		SetSliderDialogInterval(0.1)
 		
 	ElseIf option == OIDNippleAreola
 		
 		SetSliderDialogStartValue(NippleAreola)
 		SetSliderDialogDefaultValue(NippleAreolaDefault)
-		SetSliderDialogRange(0, 1)
+		SetSliderDialogRange(0, 3)
 		SetSliderDialogInterval(0.1)
 		
 	ElseIf option == OIDDoubleMelon
 		
 		SetSliderDialogStartValue(DoubleMelon)
 		SetSliderDialogDefaultValue(DoubleMelonDefault)
-		SetSliderDialogRange(0, 1)
+		SetSliderDialogRange(0, 3)
 		SetSliderDialogInterval(0.1)
 		
 	ElseIf option == OIDBreastsFantasy
 		
 		SetSliderDialogStartValue(BreastsFantasy)
 		SetSliderDialogDefaultValue(BreastsFantasyDefault)
-		SetSliderDialogRange(0, 1)
+		SetSliderDialogRange(0, 3)
 		SetSliderDialogInterval(0.1)
 		
 	ElseIf option == OIDNipplePerkiness
 		
 		SetSliderDialogStartValue(NipplePerkiness)
 		SetSliderDialogDefaultValue(NipplePerkinessDefault)
-		SetSliderDialogRange(0, 1)
+		SetSliderDialogRange(0, 3)
 		SetSliderDialogInterval(0.1)
 		
 	ElseIf option == OIDNippleLength
 		
 		SetSliderDialogStartValue(NippleLength)
 		SetSliderDialogDefaultValue(NippleLengthDefault)
-		SetSliderDialogRange(-10, 1)
+		SetSliderDialogRange(-10, 3)
 		SetSliderDialogInterval(0.1)
 		
 	ElseIf option == OIDChubbyArms
 		
 		SetSliderDialogStartValue(ChubbyArms)
 		SetSliderDialogDefaultValue(ChubbyArmsDefault)
-		SetSliderDialogRange(0, 1)
+		SetSliderDialogRange(0, 3)
 		SetSliderDialogInterval(0.1)
 		
 	ElseIf option == OIDChubbyWaist
 		
 		SetSliderDialogStartValue(ChubbyWaist)
 		SetSliderDialogDefaultValue(ChubbyWaistDefault)
-		SetSliderDialogRange(0, 1)
+		SetSliderDialogRange(0, 3)
 		SetSliderDialogInterval(0.1)
 		
 	ElseIf option == OIDChubbyButt
 		
 		SetSliderDialogStartValue(ChubbyButt)
 		SetSliderDialogDefaultValue(ChubbyButtDefault)
-		SetSliderDialogRange(0, 1)
+		SetSliderDialogRange(0, 3)
 		SetSliderDialogInterval(0.1)
 		
 	ElseIf option == OIDChubbyLegs
 		
 		SetSliderDialogStartValue(ChubbyLegs)
 		SetSliderDialogDefaultValue(ChubbyLegsDefault)
-		SetSliderDialogRange(0, 1)
+		SetSliderDialogRange(0, 3)
 		SetSliderDialogInterval(0.1)
 		
 	ElseIf option == OIDButtShape2
 		
 		SetSliderDialogStartValue(ButtShape2)
 		SetSliderDialogDefaultValue(ButtShape2Default)
-		SetSliderDialogRange(0, 1)
+		SetSliderDialogRange(0, 3)
 		SetSliderDialogInterval(0.1)
 		
 	ElseIf option == OIDPregnancyBelly
 		
 		SetSliderDialogStartValue(PregnancyBelly)
 		SetSliderDialogDefaultValue(PregnancyBellyDefault)
-		SetSliderDialogRange(0, 1)
+		SetSliderDialogRange(0, 3)
 		SetSliderDialogInterval(0.1)
 		
 	ElseIf option == OIDPregnancyDuration
