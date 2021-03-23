@@ -31,6 +31,7 @@ MagicEffect Property HentaiMilkSquirtSpellEffect Auto
 SoulGem Property SoulGemBlackFilled Auto
 SoulGem Property SoulGemGrandFilled Auto
 SoulGem Property SoulGemGreaterFilled Auto
+SoulGem Property SoulGemCommonFilled Auto
 SoulGem Property SoulGemLesserFilled Auto
 SoulGem Property SoulGemPettyFilled Auto
 
@@ -768,17 +769,23 @@ form function getSoulGemSize(int pregnancyID)
 		return none
 	endif
 	float soulGemSize = (pregnancy.getCurrentHour() - pregnancy.getSoulGemStartHour()) / (config.SoulGemDuration * pregnancy.getSoulGemCount())
-	If soulGemSize >= 4 && !pregnancy.getFatherIsCreature()
+
+	;Soul Gems
+	If soulGemSize >= 5 && !pregnancy.getFatherIsCreature()
 		return SoulGemBlackFilled
-	elseIf soulGemSize >= 4
+	elseIf soulGemSize >= 5
 		return SoulGemGrandFilled
-	elseIf soulGemSize >= 3
+	elseIf soulGemSize >= 4
 		return SoulGemGreaterFilled
+	elseIf soulGemSize >= 3
+		return SoulGemCommonFilled
 	elseIf soulGemSize >= 2
 		return SoulGemLesserFilled
 	elseif soulGemSize >= 1
 		return SoulGemPettyFilled
 	endIf
+	
+	;Soul Gem Fragments
 	Int i = Utility.RandomInt(1,5)
 	if i == 1
 		return 	Game.GetFormFromFile(0x67181, "skyrim.esm")
