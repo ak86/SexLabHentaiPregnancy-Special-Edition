@@ -557,6 +557,7 @@ function ResetBody(Actor ActorRef)
 	BodyMod.ClearMorphScale(ActorRef, "ChubbyButt")
 	BodyMod.ClearMorphScale(ActorRef, "ChubbyLegs")
 	BodyMod.ClearMorphScale(ActorRef, "ButtShape2")
+	BodyMod.ClearMorphScale(ActorRef, "Groin")
 	BodyMod.ClearMorphScale(ActorRef, "PregnancyBelly")
 	;pregnancy milk
 	BodyMod.ClearMorphScale(ActorRef, "DoubleMelon")

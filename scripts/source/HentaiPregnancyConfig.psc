@@ -90,6 +90,10 @@ int OIDButtShape2
 Float Property ButtShape2 = 0.0 Auto Hidden
 Float ButtShape2Default = 0.0
 
+int OIDGroin
+Float Property Groin = 0.0 Auto Hidden
+Float GroinDefault = 0.0
+
 int OIDPregnancyBelly
 Float Property PregnancyBelly = 0.5 Auto Hidden
 Float PregnancyBellyDefault = 0.5
@@ -353,6 +357,7 @@ Event OnPageReset(string page)
 				OIDChubbyButt = AddSliderOption("$HP_MCM_ChubbyButt", ChubbyButt, "{2}")
 				OIDChubbyLegs = AddSliderOption("$HP_MCM_ChubbyLegs", ChubbyLegs, "{2}")
 				OIDButtShape2 = AddSliderOption("$HP_MCM_ButtShape2", ButtShape2, "{2}")
+				OIDGroin = AddSliderOption("$HP_MCM_Groin", Groin, "{2}")
 				OIDPregnancyBelly = AddSliderOption("$HP_MCM_PregnancyBelly_node", PregnancyBelly, "{2}")
 				AddEmptyOption()
 
@@ -679,6 +684,13 @@ Event OnOptionSliderAccept(int option, float floatValue)
 		hentaiPregnancyQuest.UpdateTargetSize()
 		hentaiPregnancyQuest.UpdateSize()
 		
+	ElseIf option == OIDGroin
+		
+		SetSliderOptionValue(option, floatValue, "{2}")
+		Groin = floatValue
+		hentaiPregnancyQuest.UpdateTargetSize()
+		hentaiPregnancyQuest.UpdateSize()	
+		
 	ElseIf option == OIDPregnancyBelly
 		
 		SetSliderOptionValue(option, floatValue, "{2}")
@@ -917,6 +929,13 @@ Event OnOptionSliderOpen(int option)
 		
 		SetSliderDialogStartValue(ButtShape2)
 		SetSliderDialogDefaultValue(ButtShape2Default)
+		SetSliderDialogRange(0, 3)
+		SetSliderDialogInterval(0.1)
+		
+	ElseIf option == OIDGroin
+		
+		SetSliderDialogStartValue(Groin)
+		SetSliderDialogDefaultValue(GroinDefault)
 		SetSliderDialogRange(0, 3)
 		SetSliderDialogInterval(0.1)
 		
